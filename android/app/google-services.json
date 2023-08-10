@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "233610521690",
+    "project_id": "e-survey-3b1f8",
+    "storage_bucket": "e-survey-3b1f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233610521690:android:953b4451d7521414c33c63",
+        "android_client_info": {
+          "package_name": "com.claims.e_survey"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233610521690-b857i9nagrr60nj6upm09qb2mk8q1jsu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUUJAp2pc32SPJZnYrx5E3Za2KC2dnvkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233610521690-b857i9nagrr60nj6upm09qb2mk8q1jsu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "233610521690-5qb1vivvo77qodjvj3lmmup0pvnt80fa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.claimsexpress.eSurvey"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233610521690:android:33349846e003efc8c33c63",
+        "android_client_info": {
+          "package_name": "com.claimsexpress.e_survey"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233610521690-b857i9nagrr60nj6upm09qb2mk8q1jsu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUUJAp2pc32SPJZnYrx5E3Za2KC2dnvkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233610521690-b857i9nagrr60nj6upm09qb2mk8q1jsu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "233610521690-5qb1vivvo77qodjvj3lmmup0pvnt80fa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.claimsexpress.eSurvey"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
