@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data'; // Import this
+import 'package:path_provider/path_provider.dart';
 
 import 'package:e_survey/Models/AppNotes.dart';
 import 'package:e_survey/Models/MissionsModel.dart';
@@ -217,10 +219,13 @@ class _NotesviewState extends State<Notesview> {
 
                               }else{
                                 // await audioPlayer.resume();
-                                if(audioFile!=null){
-                                  print(audioFile);
-
-                                  await   audioPlayer.play(ap.UrlSource(audioFile.path));
+                                try {
+                                  if (audioFile != null) {
+                                    print(audioFile);
+                                    await audioPlayer.play(ap.UrlSource(audioFile.path));
+                                  }
+                                } catch (e) {
+                                  print('Error playing audio: $e');
                                 }
                               }
 
@@ -425,7 +430,10 @@ class _NotesviewState extends State<Notesview> {
     log("pppppppppppppppppppppppp///////////");
 //print(f.path);
     log("pppppppppppppppppppppppp///////////");
-    audioFile = File('/data/user/0/com.claimsexpress.e_survey/cache/audio') ;
+    Directory documentDirectory = await getApplicationDocumentsDirectory();
+    String audioFilePath = '${documentDirectory.path}/audio.mp3';
+
+    audioFile = File(audioFilePath) ;
 
     if(appNotes.voiceNote!=""||appNotes.voiceNote.isNotEmpty){
       log("kkkkkkkkkkkkkkkkknnnnnnnnnnnn");
@@ -445,6 +453,54 @@ class _NotesviewState extends State<Notesview> {
 
     setState((){});
   }
+
+
+// ...
+
+
+
+
+
+
+
+
+
+
+// ...
+
+  // void getNotes() async {
+  //   appNotes = await TemaServiceApi().getNotes(GetStorage().read('token'), m.accidentId);
+  //   progress = false;
+  //   _controller.text = appNotes.notesRemark;
+  //   print("//////////////////////nnnnnn");
+  //
+  //   if (appNotes.voiceNote != null && appNotes.voiceNote.isNotEmpty) {
+  //     try {
+  //       print("//////////////////////uuuuuuuuuuuu");
+  //
+  //       Uint8List audioBytes = appNotes.voiceNote as Uint8List;
+  //
+  //       // Get the document directory to save the audio file
+  //       Directory documentDirectory = await getApplicationDocumentsDirectory();
+  //       String audioFilePath = '${documentDirectory.path}/audio.mp3';
+  //
+  //       // Write the audio bytes to the file
+  //       File audioFile2 = File(audioFilePath);
+  //       await audioFile2.writeAsBytes(audioBytes);
+  //       // Save the audio file path for later use
+  //       print("sucess");
+  //
+  //       audioFile = audioFile2; // Define savedAudioFilePath at the class level
+  //
+  //     } catch (e) {
+  //       print("Error saving audio: $e");
+  //     }
+  //   }
+
+  //   progress = false;
+  //   setState(() {});
+  // }
+
 
 
 }
