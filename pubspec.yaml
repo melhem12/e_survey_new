@@ -67,7 +67,7 @@ dev_dependencies:
   flutter_number_picker: ^1.0.4
   flutter_sound: ^9.2.13
   just_audio: ^0.9.21
-  audioplayers: ^0.20.1
+  audioplayers: ^5.1.0
   custom_check_box: ^0.0.4
   flutter_foreground_task: ^6.0.0+1
   advance_image_picker: ^0.1.7+1
