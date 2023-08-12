@@ -72,6 +72,9 @@ dev_dependencies:
   custom_check_box: ^0.0.4
   flutter_foreground_task: ^6.0.0+1
   advance_image_picker: ^0.1.7+1
+
+    #flutter_ffmpeg: ^0.3.1
+  audio_session: ^0.1.6
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

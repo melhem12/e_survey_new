@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/View/notes.dart';
+import 'package:e_survey/View/notess.dart';
+
 import 'package:e_survey/service/TemaServiceApi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -460,7 +462,7 @@ appBodly.bodlyInsCountSeverInj=index;
 
                       await TemaServiceApi().updateCarsAppBodly(m.accidentId, box.read('token'), appBodly);
 
-                      Get.to( Notesview(),arguments: m);
+                      Get.to( NotessView(),arguments: m);
 
                     },
                     style: ElevatedButton.styleFrom(
