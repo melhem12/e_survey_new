@@ -468,38 +468,38 @@ class _NotesviewState extends State<Notesview> {
 
 // ...
 
-  // void getNotes() async {
-  //   appNotes = await TemaServiceApi().getNotes(GetStorage().read('token'), m.accidentId);
-  //   progress = false;
-  //   _controller.text = appNotes.notesRemark;
-  //   print("//////////////////////nnnnnn");
-  //
-  //   if (appNotes.voiceNote != null && appNotes.voiceNote.isNotEmpty) {
-  //     try {
-  //       print("//////////////////////uuuuuuuuuuuu");
-  //
-  //       Uint8List audioBytes = appNotes.voiceNote as Uint8List;
-  //
-  //       // Get the document directory to save the audio file
-  //       Directory documentDirectory = await getApplicationDocumentsDirectory();
-  //       String audioFilePath = '${documentDirectory.path}/audio.mp3';
-  //
-  //       // Write the audio bytes to the file
-  //       File audioFile2 = File(audioFilePath);
-  //       await audioFile2.writeAsBytes(audioBytes);
-  //       // Save the audio file path for later use
-  //       print("sucess");
-  //
-  //       audioFile = audioFile2; // Define savedAudioFilePath at the class level
-  //
-  //     } catch (e) {
-  //       print("Error saving audio: $e");
-  //     }
-  //   }
+// void getNotes() async {
+//   appNotes = await TemaServiceApi().getNotes(GetStorage().read('token'), m.accidentId);
+//   progress = false;
+//   _controller.text = appNotes.notesRemark;
+//   print("//////////////////////nnnnnn");
+//
+//   if (appNotes.voiceNote != null && appNotes.voiceNote.isNotEmpty) {
+//     try {
+//       print("//////////////////////uuuuuuuuuuuu");
+//
+//       Uint8List audioBytes = appNotes.voiceNote as Uint8List;
+//
+//       // Get the document directory to save the audio file
+//       Directory documentDirectory = await getApplicationDocumentsDirectory();
+//       String audioFilePath = '${documentDirectory.path}/audio.mp3';
+//
+//       // Write the audio bytes to the file
+//       File audioFile2 = File(audioFilePath);
+//       await audioFile2.writeAsBytes(audioBytes);
+//       // Save the audio file path for later use
+//       print("sucess");
+//
+//       audioFile = audioFile2; // Define savedAudioFilePath at the class level
+//
+//     } catch (e) {
+//       print("Error saving audio: $e");
+//     }
+//   }
 
-  //   progress = false;
-  //   setState(() {});
-  // }
+//   progress = false;
+//   setState(() {});
+// }
 
 
 

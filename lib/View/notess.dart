@@ -49,7 +49,7 @@ class _NotessViewState extends State<NotessView> {
   late Mission m;
 
   Codec _codec = Codec.aacMP4;
-  String _mPath = 'tau_file.mp4';
+  String _mPath = 'tau_file';
   FlutterSoundPlayer? _mPlayer = FlutterSoundPlayer();
   FlutterSoundRecorder? _mRecorder = FlutterSoundRecorder();
   bool _mPlayerIsInited = false;
@@ -58,7 +58,10 @@ class _NotessViewState extends State<NotessView> {
 
   @override
   void initState() {
+
     m =  Get.arguments as Mission ;
+    _mPath=_mPath+m.accidentId+".mp4";
+
     progress =true;
     getNotes();
 
@@ -199,6 +202,7 @@ class _NotessViewState extends State<NotessView> {
 
 
   void getNotes() async {
+
     appNotes=  await TemaServiceApi().getNotes(GetStorage().read('token'), m.accidentId);
     progress =false;
     _controller.text=appNotes.notesRemark;
@@ -214,7 +218,13 @@ class _NotessViewState extends State<NotessView> {
 
     if(appNotes.voiceNote!=""||appNotes.voiceNote.isNotEmpty){
       log("kkkkkkkkkkkkkkkkknnnnnnnnnnnn");
-       File f=  await File(audioFilePath).writeAsBytes(base64Decode(appNotes.voiceNote)) as File;
+     // bool exist = await File(audioFilePath).exists();
+     // if(exist){
+     //   await File(audioFilePath).delete() ;
+     //
+     // }
+
+      File f=  await File(audioFilePath).writeAsBytes(base64Decode(appNotes.voiceNote)) as File;
        _mRecorderIsInited = true;
 _mplaybackReady=true;
       //  file.writeAsBytesCompat(base64Decode(appNotes.voiceNote));
@@ -223,7 +233,7 @@ _mplaybackReady=true;
     // if(audioFile!=null){
     //   print(audioFile);
     //   await   audioPlayer.play(audioFile!.path, isLocal: true);
-    //
+    //esp
     // }
     progress=false;
 

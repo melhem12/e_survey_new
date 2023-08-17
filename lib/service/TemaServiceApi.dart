@@ -92,7 +92,7 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
       });
 
       appDamages = [];
-      final extractedData = json.decode(response.body);
+      final extractedData = json.decode(utf8.decode(response.bodyBytes));
       if(extractedData != null) {
         List data = extractedData['damageCapList'];
         for (var i in data) {
@@ -122,7 +122,7 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
       });
 
       responsabilities = [];
-      final extractedData = json.decode(response.body);
+      final extractedData = json.decode((utf8.decode(response.bodyBytes)));
       if(extractedData != null) {
         List data = extractedData['responsabilityList'];
         for (var i in data) {
@@ -152,7 +152,7 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
       });
 
       doubtsList = [];
-      final extractedData = json.decode(response.body);
+      final extractedData = json.decode((utf8.decode(response.bodyBytes)));
       if(extractedData != null) {
         List data = extractedData['doubtsList'];
         for (var i in data) {
@@ -257,7 +257,7 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
     });
     if (response.statusCode == 200) {
       try {
-        appNotes=AppNotes.fromJson(jsonDecode(response.body));
+        appNotes=AppNotes.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
 
       } catch (e) {
         log(e.toString());
