@@ -11,6 +11,7 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:e_survey/View/expert_missions.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 import 'package:e_survey/service/TemaServiceApi.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
@@ -49,7 +50,7 @@ class _NotessViewState extends State<NotessView> {
   late Mission m;
 
   Codec _codec = Codec.aacMP4;
-  String _mPath = 'tau_file';
+  String _mPath = '';
   FlutterSoundPlayer? _mPlayer = FlutterSoundPlayer();
   FlutterSoundRecorder? _mRecorder = FlutterSoundRecorder();
   bool _mPlayerIsInited = false;
@@ -60,7 +61,7 @@ class _NotessViewState extends State<NotessView> {
   void initState() {
 
     m =  Get.arguments as Mission ;
-    _mPath=_mPath+m.accidentId+".mp4";
+    // _mPath=_mPath+m.accidentId+".mp4";
 
     progress =true;
     getNotes();
@@ -95,6 +96,9 @@ class _NotessViewState extends State<NotessView> {
         throw RecordingPermissionException('Microphone permission not granted');
       }
     }
+    // Initialize _mPath with the appropriate directory path
+    final appDocumentsDirectory = await path_provider.getApplicationDocumentsDirectory();
+    _mPath = '${appDocumentsDirectory.path}/tau_file.mp4';
     await _mRecorder!.openRecorder();
     if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
       _codec = Codec.opusWebM;
@@ -212,21 +216,24 @@ class _NotessViewState extends State<NotessView> {
     log("pppppppppppppppppppppppp///////////");
 //print(f.path);
     log("pppppppppppppppppppppppp///////////");
-    Directory documentDirectory = await getApplicationCacheDirectory();
-    String audioFilePath = '${documentDirectory.path}/${_mPath}';
+    // Directory documentDirectory = await getApplicationCacheDirectory();
+    // String audioFilePath = '${documentDirectory.path}/${_mPath}';
 
 
     if(appNotes.voiceNote!=""||appNotes.voiceNote.isNotEmpty){
-      log("kkkkkkkkkkkkkkkkknnnnnnnnnnnn");
-     // bool exist = await File(audioFilePath).exists();
-     // if(exist){
-     //   await File(audioFilePath).delete() ;
-     //
-     // }
+      final appDocumentsDirectory = await path_provider.getApplicationDocumentsDirectory();
+      _mPath = '${appDocumentsDirectory.path}/tau_file.mp4';
 
-      File f=  await File(audioFilePath).writeAsBytes(base64Decode(appNotes.voiceNote)) as File;
-       _mRecorderIsInited = true;
-_mplaybackReady=true;
+      log("kkkkkkkkkkkkkkkkknnnnnnnnnnnn");
+      // bool exist = await File(audioFilePath).exists();
+      // if(exist){
+      //   await File(audioFilePath).delete() ;
+      //
+      // }
+
+     File f=  await File(_mPath).writeAsBytes(base64Decode(appNotes.voiceNote)) as File;
+     _mRecorderIsInited = true;
+     _mplaybackReady=true;
       //  file.writeAsBytesCompat(base64Decode(appNotes.voiceNote));
       log("nfffffff");
     }
@@ -251,219 +258,217 @@ _mplaybackReady=true;
         Center(
             child:
             Card(
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-      child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildMultilineTextField(),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildMultilineTextField(),
 
-        Container(
-            margin: const EdgeInsets.all(3),
-            padding: const EdgeInsets.all(3),
-            height: 80,
-            width: double.infinity,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color(0xFFFAF0E6),
-              border: Border.all(
-                color: Colors.indigo,
-                width: 3,
-              ),
-            ),
-            child: Row(children: [
-              ElevatedButton(
-                onPressed: getRecorderFn(),
-                //color: Colors.white,
-                //disabledColor: Colors.grey,
-                child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Text(_mRecorder!.isRecording
-                  ? 'Recording in progress'
-                  : 'Recorder is stopped'),
-            ]),
-          ),
-          Container(
-            margin: const EdgeInsets.all(3),
-            padding: const EdgeInsets.all(3),
-            height: 80,
-            width: double.infinity,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Color(0xFFFAF0E6),
-              border: Border.all(
-                color: Colors.indigo,
-                width: 3,
-              ),
-            ),
-            child: Row(children: [
-              ElevatedButton(
-                onPressed: getPlaybackFn(),
-                //color: Colors.white,
-                //disabledColor: Colors.grey,
-                child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Text(_mPlayer!.isPlaying
-                  ? 'Playback in progress'
-                  : 'Player is stopped'),
-            ]),
-          ),
+                        Container(
+                          margin: const EdgeInsets.all(3),
+                          padding: const EdgeInsets.all(3),
+                          height: 80,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFFAF0E6),
+                            border: Border.all(
+                              color: Colors.indigo,
+                              width: 3,
+                            ),
+                          ),
+                          child: Row(children: [
+                            ElevatedButton(
+                              onPressed: getRecorderFn(),
+                              //color: Colors.white,
+                              //disabledColor: Colors.grey,
+                              child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text(_mRecorder!.isRecording
+                                ? 'Recording in progress'
+                                : 'Recorder is stopped'),
+                          ]),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.all(3),
+                          padding: const EdgeInsets.all(3),
+                          height: 80,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFFAF0E6),
+                            border: Border.all(
+                              color: Colors.indigo,
+                              width: 3,
+                            ),
+                          ),
+                          child: Row(children: [
+                            ElevatedButton(
+                              onPressed: getPlaybackFn(),
+                              //color: Colors.white,
+                              //disabledColor: Colors.grey,
+                              child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text(_mPlayer!.isPlaying
+                                ? 'Playback in progress'
+                                : 'Player is stopped'),
+                          ]),
+                        ),
 
 
 
-        SizedBox(
-          height: 20,
-          width: double.infinity,
-        ),
+                        SizedBox(
+                          height: 20,
+                          width: double.infinity,
+                        ),
 
-        Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: ElevatedButton(
-                      child: Text(
-                        "عودة",style: TextStyle(color: Colors.white ,fontSize: 17),
-                      ),
-                      onPressed: () async {
+                        Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
+                              Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    child: ElevatedButton(
+                                      child: Text(
+                                        "عودة",style: TextStyle(color: Colors.white ,fontSize: 17),
+                                      ),
+                                      onPressed: () async {
 
-                        // TemaServiceApi tema = new TemaServiceApi();
-                        //await tema.updateAccidentStatus("rejected", m.accidentId, box.read("token").toString());
+                                        // TemaServiceApi tema = new TemaServiceApi();
+                                        //await tema.updateAccidentStatus("rejected", m.accidentId, box.read("token").toString());
 
-                        progress=true;
-                        setState((){
-                        });
-                        if (_mRecorder!=null){
-                          Directory documentDirectory = await getApplicationCacheDirectory();
-                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
-                          await TemaServiceApi().uploadNotes( audioFilePath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                                        progress=true;
+                                        setState((){
+                                        });
+                                        if (_mRecorder!=null){
+                                          Directory documentDirectory = await getApplicationCacheDirectory();
+                                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
+                                          await TemaServiceApi().uploadNotes( _mPath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                        }else{
-                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                                        }else{
+                                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                        }
-                        progress=false;
-                        setState((){
-                        });
-                        Get.back(result: 'hello');
+                                        }
+                                        progress=false;
+                                        setState((){
+                                        });
+                                        Get.back(result: 'hello');
 
-                      },
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(
-                              fontSize: 30,
-                              fontWeight:
-                              FontWeight.bold)),
-                    ),
-                  )),
-              SizedBox(
-                width: 20,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: ElevatedButton(
-                      child: Text(
-                        "حفظ",style: TextStyle(color: Colors.white
-                          ,fontSize: 17),
-                      ),
-                      onPressed: () async {
-                        progress=true;
-                        setState((){
-                        });
-                        if (_mRecorder!=null){
-                          Directory documentDirectory = await getApplicationCacheDirectory();
-                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
-                          print('nfokhoooooooooooooooooo       ${audioFilePath}');
-                          await TemaServiceApi().uploadNotes( audioFilePath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.blue,
+                                          textStyle: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight:
+                                              FontWeight.bold)),
+                                    ),
+                                  )),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    child: ElevatedButton(
+                                      child: Text(
+                                        "حفظ",style: TextStyle(color: Colors.white
+                                          ,fontSize: 17),
+                                      ),
+                                      onPressed: () async {
+                                        progress=true;
+                                        setState((){
+                                        });
+                                        if (_mRecorder!=null){
+                                          Directory documentDirectory = await getApplicationCacheDirectory();
+                                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
+                                          print('nfokhoooooooooooooooooo       ${audioFilePath}');
+                                          await TemaServiceApi().uploadNotes( _mPath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                        }else{
-                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                                        }else{
+                                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                        }
+                                        }
 
-                        progress=false;
-                        setState((){
-                        });
+                                        progress=false;
+                                        setState((){
+                                        });
 //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-                        // Get.to(ArrivationVerification(),arguments: m);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(
-                              fontSize: 30,
-                              fontWeight:
-                              FontWeight.bold)),
-                    ),
-                  ))
-            ]
-        ),
-        Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
+                                        // Get.to(ArrivationVerification(),arguments: m);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.blue,
+                                          textStyle: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight:
+                                              FontWeight.bold)),
+                                    ),
+                                  ))
+                            ]
+                        ),
+                        Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: <Widget>[
 
-              Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: ElevatedButton(
-                      child: Text(
-                        "حفظ وإنهاء",style: TextStyle(color: Colors.white
-                          ,fontSize: 17),
-                      ),
-                      onPressed: () async {
-                        progress = true;
-                        setState((){
+                              Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    child: ElevatedButton(
+                                      child: Text(
+                                        "حفظ وإنهاء",style: TextStyle(color: Colors.white
+                                          ,fontSize: 17),
+                                      ),
+                                      onPressed: () async {
+                                        progress = true;
+                                        setState((){
 
-                        });
+                                        });
 
-                        if (_mRecorder!=null){
-                          Directory documentDirectory = await getApplicationCacheDirectory();
-                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
-                          print('nfokhoooooooooooooooooo       ${audioFilePath}');
-                          await TemaServiceApi().uploadNotes( audioFilePath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-                          await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
+                                        if (_mRecorder!=null){
+                                          Directory documentDirectory = await getApplicationCacheDirectory();
+                                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
+                                          print('nfokhoooooooooooooooooo       ${audioFilePath}');
+                                          await TemaServiceApi().uploadNotes( _mPath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                                          await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
 
-                        }
-                        else{
-                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-                          await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
+                                        }
+                                        else{
+                                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                                          await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
 
-                        }
-                        progress = false;
-                        setState((){
+                                        }
+                                        progress = false;
+                                        setState((){
 
-                        });
-                        Get.offAll(()=>ExpertMissions());
-                        //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-                        // Get.to(ArrivationVerification(),arguments: m);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
-                          textStyle: TextStyle(
-                              fontSize: 30,
-                              fontWeight:
-                              FontWeight.bold)),
-                    ),
-                  ))
-            ]
-        ),
-
-
+                                        });
+                                        Get.offAll(()=>ExpertMissions());
+                                        //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
+                                        // Get.to(ArrivationVerification(),arguments: m);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.blue,
+                                          textStyle: TextStyle(
+                                              fontSize: 30,
+                                              fontWeight:
+                                              FontWeight.bold)),
+                                    ),
+                                  ))
+                            ]
+                        ),
 
 
 
@@ -472,8 +477,10 @@ _mplaybackReady=true;
 
 
 
-        ],
-      )))));
+
+
+                      ],
+                    )))));
     }
 
 
@@ -483,35 +490,35 @@ _mplaybackReady=true;
 
 
       WillPopScope (
-        onWillPop: (
+          onWillPop: (
 
-    )  async {
-      progress=true;
-      setState(() {
+              )  async {
+            progress=true;
+            setState(() {
 
-      });
-      if (_mRecorder!=null){
-        Directory documentDirectory = await getApplicationCacheDirectory();
-        String audioFilePath = '${documentDirectory.path}/${_mPath}';
-        await TemaServiceApi().uploadNotes(audioFilePath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-print("kkkkkkkkkkkkkkkkkkkkkk");
-      }else{
-        await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+            });
+            if (_mRecorder!=null){
+              Directory documentDirectory = await getApplicationCacheDirectory();
+              String audioFilePath = '${documentDirectory.path}/${_mPath}';
+              await TemaServiceApi().uploadNotes(_mPath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+              print("kkkkkkkkkkkkkkkkkkkkkk");
+            }else{
+              await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-      }
-      progress=false;
-      setState(() {
+            }
+            progress=false;
+            setState(() {
 
-      });
-      return true;
-    },
-    child :
+            });
+            return true;
+          },
+          child :
 
-      Scaffold(
-        appBar: AppBar(title: const Text("ملاحظات"),),
+          Scaffold(
+            appBar: AppBar(title: const Text("ملاحظات"),),
 
-        body: makeBody(),
-      ));
+            body: makeBody(),
+          ));
   }
 
   Widget _buildMultilineTextField() {
