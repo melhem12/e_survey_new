@@ -53,7 +53,6 @@ WidgetsFlutterBinding.ensureInitialized(),
 
 
 
-//FirebaseMessaging messaging = FirebaseMessaging.instance,
 FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler),
 
 FirebaseMessaging.onMessage.listen((RemoteMessage message) {

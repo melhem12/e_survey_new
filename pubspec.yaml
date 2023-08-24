@@ -52,7 +52,8 @@ dev_dependencies:
   image_picker: ^0.8.5+3
   async: ^2.8.2
   sqflite: ^2.0.1
-  geolocator: ^8.0.1
+#  geolocator: ^8.0.1
+  geolocator: ^10.0.0
   awesome_dialog: ^2.1.2
   android_intent: ^2.0.2
   permission_handler: ^8.3.0

@@ -16,6 +16,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:android_intent/android_intent.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 // The callback function should always be a top-level function.
 void startCallback() {
@@ -35,7 +36,7 @@ class ExpertMissions extends StatefulWidget {
 class _ExpertMissionsState extends State<ExpertMissions> {
   late Position _position;
   final box = GetStorage();
-
+   String token="";
   String? filter;
   ReceivePort? _receivePort;
   final MissionsViewModel controller =
@@ -47,6 +48,8 @@ class _ExpertMissionsState extends State<ExpertMissions> {
   @override
   void initState() {
     super.initState();
+
+token=box.read("token");
     // _initForegroundTask();
     // _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
     //   // You can get the previous ReceivePort without restarting the service.
@@ -66,6 +69,9 @@ class _ExpertMissionsState extends State<ExpertMissions> {
         _registerReceivePort(newReceivePort);
       }
     });
+    FirebaseMessaging.instance.requestPermission();
+    print("///////////KKKKKKKKLLLLL");
+    FirebaseMessaging.instance;
     getPosition();
     Timer.periodic(const Duration(seconds: 30), (Timer timer) {
       // if (!_isRunning) {
@@ -692,7 +698,9 @@ box.erase(),
 
   }
   Future<Position> getLatAndLong() async{
-    _position=await Geolocator.getCurrentPosition().then((value) => value);
+    // _position=await Geolocator.getCurrentPosition().then((value) => value);
+     _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
     return _position;
   }
   Future _gpsService() async {
@@ -795,7 +803,8 @@ class MyTaskHandler extends TaskHandler {
   late Position _position;
   Future<Position> getLatAndLong() async{
     print('getLatAndLong  ---- ');
-    _position=await Geolocator.getCurrentPosition().then((value) => value);
+    _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
     return _position;
   }
   // @override
@@ -863,12 +872,14 @@ class MyTaskHandler extends TaskHandler {
     print('before getLong ');
     getLatAndLong();
 
-    print("My token "+GetStorage().read("token"));
+    final token = GetStorage().read("token");
+    print("My token: ${token ?? 'Token not available'}");
 
-     await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), GetStorage().read("token"));
+    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
 
     print("My lattitude "+_position.latitude.toString());
     print("My longitude "+_position.longitude.toString());
+
   }
 
 

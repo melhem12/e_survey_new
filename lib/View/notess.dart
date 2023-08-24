@@ -377,15 +377,12 @@ class _NotessViewState extends State<NotessView> {
                                         progress=true;
                                         setState((){
                                         });
-                                        if (_mRecorder!=null){
+
                                           Directory documentDirectory = await getApplicationCacheDirectory();
                                           String audioFilePath = '${documentDirectory.path}/${_mPath}';
                                           await TemaServiceApi().uploadNotes( _mPath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                                        }else{
-                                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                                        }
                                         progress=false;
                                         setState((){
                                         });
@@ -418,16 +415,13 @@ class _NotessViewState extends State<NotessView> {
                                         progress=true;
                                         setState((){
                                         });
-                                        if (_mRecorder!=null){
+
                                           Directory documentDirectory = await getApplicationCacheDirectory();
                                           String audioFilePath = '${documentDirectory.path}/${_mPath}';
                                           print('nfokhoooooooooooooooooo       ${audioFilePath}');
                                           await TemaServiceApi().uploadNotes( _mPath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                                        }else{
-                                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-                                        }
 
                                         progress=false;
                                         setState((){
@@ -463,19 +457,14 @@ class _NotessViewState extends State<NotessView> {
 
                                         });
 
-                                        if (_mRecorder!=null){
+
                                           Directory documentDirectory = await getApplicationCacheDirectory();
                                           String audioFilePath = '${documentDirectory.path}/${_mPath}';
                                           print('nfokhoooooooooooooooooo       ${audioFilePath}');
                                           await TemaServiceApi().uploadNotes( _mPath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
                                           await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
 
-                                        }
-                                        else{
-                                          await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-                                          await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
 
-                                        }
                                         progress = false;
                                         setState((){
 
@@ -522,15 +511,12 @@ class _NotessViewState extends State<NotessView> {
             setState(() {
 
             });
-            if (_mRecorder!=null){
+
               Directory documentDirectory = await getApplicationCacheDirectory();
               String audioFilePath = '${documentDirectory.path}/${_mPath}';
               await TemaServiceApi().uploadNotes(_mPath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
               print("kkkkkkkkkkkkkkkkkkkkkk");
-            }else{
-              await TemaServiceApi().uploadNotes(null, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
 
-            }
             progress=false;
             setState(() {
 

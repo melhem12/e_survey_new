@@ -1,5 +1,6 @@
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:e_survey/Models/AppBodly.dart';
 import 'package:e_survey/Models/AppDamagesParts.dart';
@@ -368,24 +369,35 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
 
 
 
-  Future uploadNotes(String  ?filename,String notesRemark,String token,String carsAppAccidentId) async {
-    var request = http.MultipartRequest('POST', Uri.parse(AppUrl.uploadNotes+"?carsAppAccidentId="+carsAppAccidentId+"&notesRemark="+notesRemark));
-  if(filename!=null){
-    request.files.add(
-        await http.MultipartFile.fromPath(
-          'file',
-          filename,
-        )
+  Future uploadNotes(String? filename, String notesRemark, String token, String carsAppAccidentId) async {
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(AppUrl.uploadNotes + "?carsAppAccidentId=$carsAppAccidentId&notesRemark=$notesRemark"),
     );
-  }
+
+    if (filename != null) {
+      var file = File(filename);
+      if (await file.exists()) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'file',
+            filename,
+          ),
+        );
+      } else {
+        print('File does not exist.');
+      }
+    }
 
     request.headers.addAll({
       'Content-Type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
-      'Authorization': 'Bearer $token'});
+      'Authorization': 'Bearer $token',
+    });
 
     var res = await request.send();
   }
+
   Future<void> updateGeoLocation(String latitude ,String longitude,String token) async {
     print("lllllllllllllllllllllllll location");
     var response = await   http.post(Uri.parse(AppUrl.updateGeoLocation),
