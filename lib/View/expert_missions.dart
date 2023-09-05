@@ -47,6 +47,8 @@ class _ExpertMissionsState extends State<ExpertMissions> {
 
   @override
   void initState() {
+    FirebaseMessaging.instance
+        .subscribeToTopic(box.read("userId").toString());
     super.initState();
 
 token=box.read("token");
@@ -69,16 +71,16 @@ token=box.read("token");
         _registerReceivePort(newReceivePort);
       }
     });
-    FirebaseMessaging.instance.requestPermission();
     print("///////////KKKKKKKKLLLLL");
-    FirebaseMessaging.instance;
+
     getPosition();
-    Timer.periodic(const Duration(seconds: 30), (Timer timer) {
+    Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
       // if (!_isRunning) {
       //   timer.cancel();
       // }
       controller.getData(GetStorage().read('token'));
-
+      _position=   await getLatAndLong();
+      await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
     });
   }
   Timer scheduleTimeout([int milliseconds = 10000]) =>
@@ -749,6 +751,7 @@ box.erase(),
                   GetStorage().write("status", "off");
                 });
                   _stopForegroundTask();
+                await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
 
                  TemaServiceApi().updateGeoStatus("notAvailable", GetStorage().read("token"));
               },
@@ -777,7 +780,10 @@ box.erase(),
 
             });
              TemaServiceApi().updateGeoStatus("available", GetStorage().read("token").toString());
-              _startForegroundTask() ;
+            _position=   await getLatAndLong();
+            await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+
+            _startForegroundTask() ;
 
 
           },
@@ -876,6 +882,8 @@ class MyTaskHandler extends TaskHandler {
     print("My token: ${token ?? 'Token not available'}");
 
     await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+log(_position.latitude.toString());
+
 
     print("My lattitude "+_position.latitude.toString());
     print("My longitude "+_position.longitude.toString());
