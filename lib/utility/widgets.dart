@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:e_survey/View/expert_missions.dart';
+import 'package:e_survey/View/expert_missions2.dart';
 import 'package:e_survey/args/CarImputArgs.dart';
 import 'package:e_survey/pages/BackCarRegistration.dart';
 import 'package:e_survey/pages/BackLicenseImage.dart';
@@ -36,10 +37,15 @@ Card makeDashboardItem(String title, IconData icon,String path,BuildContext cont
         decoration: BoxDecoration(color: Colors.white),
         child: new InkWell(
           onTap: () {
+            if(path=="/missions2"){
+              Get.to(()=>ExpertMissions2());
+              //Navigator.pushNamed(context, path);
+             // Get.toNamed(path);
+            }
             if(path=="/missions"){
               Get.to(()=>ExpertMissions());
               //Navigator.pushNamed(context, path);
-             // Get.toNamed(path);
+              // Get.toNamed(path);
             }
             else {
               Get.toNamed(path);

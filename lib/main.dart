@@ -30,6 +30,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'View/damage_part.dart';
+import 'View/expert_missions2.dart';
 import 'ViewModels/MissionsViewModel.dart';
 import 'args/claimsListArgs.dart';
 import 'firebase_options.dart';
@@ -91,7 +92,9 @@ print('Message also contained a notification: ${message.notification}');
 //         ],
         routes: {
           '/home': (context) => Home(),
+          '/missions2': (context) => ExpertMissions2(),
           '/missions': (context) => ExpertMissions(),
+
           '/dashboard': (context) => Dashboard(),
           '/': (context) => Signin(),
           '/mySurvey': (context) => mySurvey(),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:e_survey/utility/widgets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +56,11 @@ class _BridgeState extends State<Bridge> {
 
                     // Text(""),
                     makeDashboardItem("Esurvey", Icons.car_repair,"/home",context),
+                    Platform.isIOS?
+                      makeDashboardItem("Tema", Icons.drive_eta,"/missions2",context):
                     makeDashboardItem("Tema", Icons.drive_eta,"/missions",context),
+
+
                     //makeDashboardItem("", Icons.task,"/",context),
 
                   ],

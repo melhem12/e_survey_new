@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/View/notes.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:group_button/group_button.dart';
+import 'package:screenshot/screenshot.dart';
 
 import '../Models/AppBodly.dart';
 class BodyDamageView extends StatefulWidget {
@@ -20,6 +22,7 @@ class BodyDamageView extends StatefulWidget {
 
 
 class _BodyDamageViewState extends State<BodyDamageView> {
+
 
   AppBodly appBodly=AppBodly(bodlyId: '', carsAppAccidentId: '0', bodlyInsCountLightInj: 0, bodlyInsCountSeverInj: 0, bodlyInsCountDeath: 0, bodlyTpCountLightInj: 0, bodlyTpCountSeverInj: 0, bodlyTpCountDeath: 0);
 

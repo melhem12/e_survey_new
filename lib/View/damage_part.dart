@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:custom_check_box/custom_check_box.dart';
 import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/View/accidentImages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:screenshot/screenshot.dart';
 
 import '../Models/AppDamagesParts.dart';
 import '../service/TemaServiceApi.dart';
@@ -16,6 +20,14 @@ class DamagePart extends StatefulWidget {
 }
 
 class _DamagePartState extends State<DamagePart> {
+
+
+  late Uint8List _imageFile;
+
+  //Create an instance of ScreenshotController
+  ScreenshotController screenshotController = ScreenshotController();
+
+
 bool circularProgress=false;
   bool checkRightFrontDoor = false;
   bool checkRightBackDoor = false;
@@ -59,14 +71,20 @@ List<AppDamagePartResponse> damageList =<AppDamagePartResponse> [];
         child: Padding(
 
 
+
         padding: const EdgeInsets.all(5.0),
 
     child:
+
 
              Column(
 
     children: [
 
+
+                 Screenshot(
+                 controller: screenshotController,
+                 child:
 
       Container(
         height: height/2,
@@ -75,10 +93,16 @@ List<AppDamagePartResponse> damageList =<AppDamagePartResponse> [];
 
 
 
-          child: circularProgress==true?const Center(child: CircularProgressIndicator()): SizedBox(
-            height: double.infinity,
+          // child: circularProgress==true?const Center(child: CircularProgressIndicator()): SizedBox(
+                child: SizedBox(
+
+               height: double.infinity,
             width: double.infinity,
-            child: Stack(
+
+            child:
+
+
+                                    Stack(
 
               children: [
                 Image.asset('assets/car-line.jpg',height: double.infinity,width: double.infinity,),
@@ -349,6 +373,7 @@ crossAxisAlignment: CrossAxisAlignment.start,
               ],
             ),
           ),
+      )
         ),
 
 
@@ -428,6 +453,18 @@ SizedBox(
 
 
                     onPressed: () async {
+
+
+    screenshotController
+        .capture(delay: Duration(milliseconds: 10))
+        .then((capturedImage) async {
+    //ShowCapturedWidget(context, capturedImage!);
+
+    }).catchError((onError) {
+    print(onError);
+    });
+
+
                       update();
                     Get.to(const AccidentImages(),arguments: m);
 
@@ -439,19 +476,45 @@ SizedBox(
                             fontWeight:
                             FontWeight.bold)),
                   ),
-                ))
+                )
+            )
           ]
       ),),
 
     ],
     )
     )
-    )
 
+        )
     )
     );
   }
+  Future<dynamic> ShowCapturedWidget(
+      BuildContext context, Uint8List capturedImage) {
+    print("why null ????????????");
+    print(capturedImage.length);
+
+    return showDialog(
+      useSafeArea: false,
+      context: context,
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          title: Text("Captured widget screenshot"),
+        ),
+        body: Center(child: Image.memory(capturedImage)),
+      ),
+    );
+  }
+
 Future<void> update() async {
+
+
+
+
+
+
+
+
 
     List<AppDamagePartResponse> parts=[];
     parts.clear();
@@ -522,12 +585,18 @@ print("checkFrontRightFender  checked");
     setState(() {
       circularProgress = true;
     });
+
+
+
+
+
  await TemaServiceApi().updateCarsAppDamageParts(parts,GetStorage().read('token'),m.accidentId);
     setState(() {
       circularProgress = false;
     });
 
   }
+
 
   Future<void> getDamagedParts() async {
     circularProgress=true;

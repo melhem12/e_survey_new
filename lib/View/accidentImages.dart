@@ -22,7 +22,7 @@ class AccidentImages extends StatefulWidget {
 class _AccidentImagesState extends State<AccidentImages> {
 
   final _picker = ImagePicker();
-  AppPictures  appPictures=AppPictures(appPicturesId: '', carsAppAccidentId: '', appPicturesGeneral: '', appPicturesCarDamage: '', appPicturesTpPolicy: '', appPicturesDLvr1: '', appPicturesDLvr2: '', appPicturesOptional1: '', appPicturesOptional2: '', appPicturesOptional3: '');
+  AppPictures  appPictures=AppPictures(appPicturesId: '', carsAppAccidentId: '', appPicturesGeneral: false, appPicturesCarDamage:false, appPicturesTpPolicy: false, appPicturesDLvr1: false, appPicturesDLvr2: false, appPicturesOptional1: false, appPicturesOptional2: false, appPicturesOptional3:false);
   File? _imageFile1;
   File? _imageFile2;
   File? _imageFile3;
@@ -71,8 +71,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                if (appPictures.appPicturesGeneral.isNotEmpty)
-                                  Expanded(  flex: 2,child:     Image.memory(base64Decode(appPictures.appPicturesGeneral),height: 50,width: 50,))
+                                if (appPictures.appPicturesGeneral)
+                                  Expanded(  flex: 2,child:     Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else if (this._imageFile1== null)
                                   const  Expanded(  flex: 2,child:  Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
 
@@ -107,8 +111,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                if (appPictures.appPicturesCarDamage.isNotEmpty)
-                                  Expanded(  flex: 2,child:  Image.memory(base64Decode(appPictures.appPicturesCarDamage),height: 50,width: 50,))
+                                if (appPictures.appPicturesCarDamage)
+                                  Expanded(  flex: 2,child:   Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else   if (this._imageFile2 == null)
                                   const  Expanded(  flex: 2,child:   Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
                                 else
@@ -141,8 +149,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                if (appPictures.appPicturesTpPolicy.isNotEmpty)
-                                  Expanded(  flex: 2 ,child:   Image.memory(base64Decode(appPictures.appPicturesTpPolicy),height: 50,width: 50,))
+                                if (appPictures.appPicturesTpPolicy)
+                                  Expanded(  flex: 2 ,child:    Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else
                                   if (this._imageFile3 == null)
                                     const Expanded(  flex: 2 ,child: Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
@@ -177,8 +189,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                               mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                if (appPictures.appPicturesDLvr1.isNotEmpty)
-                                  Expanded(  flex: 2,child: Image.memory(base64Decode(appPictures.appPicturesDLvr1),height: 50,width: 50,))
+                                if (appPictures.appPicturesDLvr1)
+                                  Expanded(  flex: 2,child:  Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else
                                   if (this._imageFile4 == null)
                                     Expanded(  flex: 2 , child: Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
@@ -218,8 +234,14 @@ class _AccidentImagesState extends State<AccidentImages> {
                               mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                if (appPictures.appPicturesDLvr2.isNotEmpty)
-                                  Expanded(  flex: 2,child:  Image.memory(base64Decode(appPictures.appPicturesDLvr2),height: 50,width: 50,))
+                                if (appPictures.appPicturesDLvr2)
+                                  Expanded(  flex: 2,child:
+                          Icon(
+                            Icons.check, // Check icon
+                            color: Colors.green, // Change the color as desired
+                            size: 24, // Change the size as desired
+                          )
+                                  )
                                 else
                                   if (this._imageFile5 == null)
                                     const Expanded(  flex: 2,child:Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
@@ -257,8 +279,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                if (appPictures.appPicturesOptional1.isNotEmpty)
-                                  Expanded(  flex: 2,child:     Image.memory(base64Decode(appPictures.appPicturesOptional1),height: 50,width: 50,))
+                                if (appPictures.appPicturesOptional1)
+                                  Expanded(  flex: 2,child:     Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else
                                   if (this._imageFile6 == null)
                                     const   Expanded(  flex: 2,child:   Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
@@ -291,8 +317,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                if (appPictures.appPicturesOptional2.isNotEmpty)
-                                  Expanded(  flex: 2,child:   Image.memory(base64Decode(appPictures.appPicturesOptional2),height: 50,width: 50,))
+                                if (appPictures.appPicturesOptional2)
+                                  Expanded(  flex: 2,child:    Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else
                                   if (this._imageFile7 == null)
                                     const   Expanded(  flex: 2,child:   Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))
@@ -325,8 +355,12 @@ class _AccidentImagesState extends State<AccidentImages> {
                             ),
                             child: Row(
                               children: <Widget>[
-                                if (appPictures.appPicturesOptional3.isNotEmpty)
-                                  Expanded(  flex: 2,child:   Image.memory(base64Decode(appPictures.appPicturesOptional3),height: 50,width: 50,))
+                                if (appPictures.appPicturesOptional3)
+                                  Expanded(  flex: 2,child:    Icon(
+                                    Icons.check, // Check icon
+                                    color: Colors.green, // Change the color as desired
+                                    size: 24, // Change the size as desired
+                                  ))
                                 else
                                   if (this._imageFile8 == null)
                                     const   Expanded(  flex: 2,child:   Placeholder(color: Colors.blue,fallbackWidth:50.0,fallbackHeight: 50.0,))

@@ -18,7 +18,9 @@ class TemaServiceApi{
 
   List<AppDamage> appDamages=[];
   late AccidentConditionModel accidentConditionModel;
-   AppPictures   appPictures = AppPictures(appPicturesId: '', carsAppAccidentId: '', appPicturesGeneral: '', appPicturesCarDamage: '', appPicturesTpPolicy: '', appPicturesDLvr1: '', appPicturesDLvr2: '', appPicturesOptional1: '', appPicturesOptional2: '', appPicturesOptional3: '');
+   AppPictures   appPictures = AppPictures(appPicturesId: '', carsAppAccidentId: '', appPicturesGeneral: false,
+       appPicturesCarDamage: false, appPicturesTpPolicy: false, appPicturesDLvr1: false,
+       appPicturesDLvr2: false, appPicturesOptional1: false, appPicturesOptional2: false, appPicturesOptional3: false);
 
 AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '', voiceNote: '');
   AppBodly appBodly=AppBodly(bodlyId: '', carsAppAccidentId: '0', bodlyInsCountLightInj: 0, bodlyInsCountSeverInj: 0, bodlyInsCountDeath: 0, bodlyTpCountLightInj: 0, bodlyTpCountSeverInj: 0, bodlyTpCountDeath: 0);
@@ -271,6 +273,34 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
 
 
 
+
+
+
+
+  Future<http.Response> uploadImageWithProgress(
+      String filePath,
+      String name,
+      String token,
+      String accidentId,
+      void Function(int sent, int total)? onProgress,
+      ) async {
+    final uri =  Uri.parse(AppUrl.uploadAccidentPicturesToDatabase+"?accidentId="+accidentId+"&name="+name);
+    final request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..fields['name'] = name
+      ..fields['accidentId'] = accidentId
+      ..files.add(http.MultipartFile(
+        'file',
+        File(filePath).readAsBytes().asStream(),
+        File(filePath).lengthSync(),
+        filename: name, // You can customize the filename here
+      ));
+
+    final responseStream = await request.send();
+    final response = await http.Response.fromStream(responseStream);
+
+    return response;
+  }
 
 
 

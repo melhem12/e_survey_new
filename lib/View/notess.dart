@@ -20,6 +20,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../Models/AppNotes.dart';
 import '../Models/MissionsModel.dart';
+import 'expert_missions2.dart';
 class NotessView extends StatefulWidget {
   const NotessView({Key? key}) : super(key: key);
 
@@ -469,6 +470,8 @@ class _NotessViewState extends State<NotessView> {
                                         setState((){
 
                                         });
+                                        Platform.isIOS?
+                                        Get.offAll(()=>ExpertMissions2()):
                                         Get.offAll(()=>ExpertMissions());
                                         //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
                                         // Get.to(ArrivationVerification(),arguments: m);

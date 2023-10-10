@@ -1,6 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:e_survey/View/expert_missions.dart';
+import 'package:e_survey/View/expert_missions2.dart';
 import 'package:e_survey/utility/app_url.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_svg/svg.dart';
@@ -14,7 +16,7 @@ import 'dart:convert';
 
 import 'bridge_page.dart';
 import 'home.dart';
-
+import 'dart:io' as io;
 class Signin extends StatefulWidget {
 
   @override
@@ -64,6 +66,9 @@ String savedUid ="";
     if(box.read('isTemaUser')=="true"){
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        io.Platform.isIOS?
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => ExpertMissions2())):
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (_) => ExpertMissions()));
       });
@@ -123,11 +128,18 @@ else
     }
     else
     if(isTemaUser){
+if(Platform.isIOS){
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => ExpertMissions2()));
+  });
+}else {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => ExpertMissions()));
+  });
+}
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => ExpertMissions()));
-      });
 
     }
 
