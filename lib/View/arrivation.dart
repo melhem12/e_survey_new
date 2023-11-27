@@ -68,14 +68,14 @@ setState(()  {
 
 
 });
-                      bool success= await TemaServiceApi().updateArrivedStatus(verificationCode, m.accidentId, box.read('token'));
+                    //  bool success= await TemaServiceApi().updateArrivedStatus(verificationCode, m.accidentId, box.read('token'));
 progress=false ;
 setState(()  {
 
 
 
 });
-                      if (success) {
+                      // if (success) {
                         showDialog(
                             context: context,
                             builder: (context){
@@ -86,18 +86,18 @@ setState(()  {
                             }
                         );
                         Get.offAll( TemaMenu(),arguments: m);
-                      }
-                      else{
-                        showDialog(
-                            context: context,
-                            builder: (context){
-                              return const AlertDialog(
-                                title: Text("Verification Failed"),
-                                content: Text("Please  Enter A valid pin"),
-                              );
-                            }
-                        );
-                      }
+                      // }
+                      // else{
+                      //   showDialog(
+                      //       context: context,
+                      //       builder: (context){
+                      //         return const AlertDialog(
+                      //           title: Text("Verification Failed"),
+                      //           content: Text("Please  Enter A valid pin"),
+                      //         );
+                      //       }
+                      //   );
+                      // }
 
 
                     }, // end onSubmit

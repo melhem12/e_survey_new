@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'arrivation_2.dart';
+
 
 
 class NewMission extends StatefulWidget {
@@ -144,7 +146,7 @@ Get.back(result: 'hello');
                           TemaServiceApi tema = new TemaServiceApi();
 
                           tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-Get.to(ArrivationVerification(),arguments: m);
+Get.to(ArrivationVerification2(),arguments: m);
                         },
                         style: ElevatedButton.styleFrom(
                             primary: Colors.blue,

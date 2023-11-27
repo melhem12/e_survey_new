@@ -1,6 +1,6 @@
 class AppUrl {
 
-  static const String baseUrl = 'http://185.37.232.39:8087/api/v1';
+  static const String baseUrl = 'http://192.168.146.1:8087/api/v1';
 
   static const String login = baseUrl + '/auth/login';
  // static const String forgotPassword = baseUrl + '/forgot_password';
@@ -56,6 +56,8 @@ class AppUrl {
   static const String updateGeoLocation = baseUrl + '/temaController/updateGeoLocation';
   static const String updateGeoStatus = baseUrl + '/temaController/updateGeoStatus';
   static const String updateCarsAppDamageParts = baseUrl + '/temaController/updateCarsAppDamageParts';
+  static const String updateCarsAppDamagePartsPic = baseUrl + '/temaController/updateCarsAppDamagePartsPic';
+
   static const String getCarsAppDamageParts = baseUrl + '/temaController/getCarsAppDamageParts';
 
 

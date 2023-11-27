@@ -1,3 +1,4 @@
+import 'package:e_survey/View/arrivation_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -112,7 +113,7 @@ class _AcceptedMissionState extends State<AcceptedMission> {
                                         ),
                                         onPressed: () async {
 
-                                          Get.to(ArrivationVerification(),arguments: m);
+                                          Get.to(ArrivationVerification2(),arguments: m);
                                         },
                                         style: ElevatedButton.styleFrom(
                                             primary: Colors.blue,

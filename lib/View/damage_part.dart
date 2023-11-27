@@ -22,7 +22,6 @@ class DamagePart extends StatefulWidget {
 class _DamagePartState extends State<DamagePart> {
 
 
-  late Uint8List _imageFile;
 
   //Create an instance of ScreenshotController
   ScreenshotController screenshotController = ScreenshotController();
@@ -455,14 +454,7 @@ SizedBox(
                     onPressed: () async {
 
 
-    screenshotController
-        .capture(delay: Duration(milliseconds: 10))
-        .then((capturedImage) async {
-    //ShowCapturedWidget(context, capturedImage!);
 
-    }).catchError((onError) {
-    print(onError);
-    });
 
 
                       update();
@@ -491,6 +483,8 @@ SizedBox(
   }
   Future<dynamic> ShowCapturedWidget(
       BuildContext context, Uint8List capturedImage) {
+
+
     print("why null ????????????");
     print(capturedImage.length);
 
@@ -587,10 +581,25 @@ print("checkFrontRightFender  checked");
     });
 
 
+    await TemaServiceApi().updateCarsAppDamageParts(parts,GetStorage().read('token'),m.accidentId);
+
+
+    screenshotController
+        .capture(delay: Duration(milliseconds: 10))
+        .then((capturedImage) async {
+     //   ShowCapturedWidget(context, capturedImage!);
 
 
 
- await TemaServiceApi().updateCarsAppDamageParts(parts,GetStorage().read('token'),m.accidentId);
+      await TemaServiceApi().updateCarsAppDamagePartsPic(GetStorage().read('token'),m.accidentId,capturedImage!);
+
+
+
+
+    }).catchError((onError) {
+      print(onError);
+    });
+
     setState(() {
       circularProgress = false;
     });

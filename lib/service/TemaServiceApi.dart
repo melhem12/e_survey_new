@@ -1,6 +1,7 @@
 
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:e_survey/Models/AppBodly.dart';
 import 'package:e_survey/Models/AppDamagesParts.dart';
@@ -54,8 +55,8 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
     }
 
   }
-  Future<bool> updateArrivedStatus(String pinCode ,String accidentId,String token) async {
-  print("mmmmmmmmmm"+pinCode);
+  Future<bool> updateArrivedStatus(bool arrived ,String accidentId,String token,String longitude,String latitude) async {
+  print("mmmmmmmmmm");
   log(token);
   log(accidentId);
     bool  success = false;
@@ -67,9 +68,12 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
         'Authorization': 'Bearer $token',
       }
       ,
-      body: jsonEncode(<String, String>{
+      body: jsonEncode(<String, Object>{
         'accidentID': accidentId,
-         'pinCode': pinCode
+         'arrived': arrived,
+      'longitude':longitude,
+      'latitude':latitude
+
       }),);
     if (response.statusCode == 201 ||response.statusCode == 200) {
       log("kkkkkkkkkkkkkk");
@@ -504,9 +508,71 @@ AppNotes  appNotes=AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '',
   }
 
 
+  Future<bool> updateCarsAppDamagePartsPic(
+      String token,
+      String accidentId,
+      Uint8List capturedImage) async {
+    try {
 
 
+      // Add the image as a MultipartFile
+      http.MultipartFile multipartFile = http.MultipartFile.fromBytes(
+        'file',
+        capturedImage,
+        filename: 'image.png',
+      );
+        Map<String,dynamic> req_body = <String,dynamic>{};
+
+
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(AppUrl.updateCarsAppDamagePartsPic+"?accidentId="+accidentId),
+
+      );
+
+      request.files.add(multipartFile);
+      // Add headers to the request
+      request.headers.addAll({
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      });
+
+
+      // Send the request and get the response
+      var streamedResponse = await request.send();
+
+      // Read the response
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
+    }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 
 
 
