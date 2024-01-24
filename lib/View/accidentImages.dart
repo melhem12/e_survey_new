@@ -7,6 +7,7 @@ import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/service/TemaServiceApi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,7 +34,7 @@ class _AccidentImagesState extends State<AccidentImages> {
   File? _imageFile8;
   Image? img1;
   bool loaded=false;
-  final box= GetStorage();
+  final box= FlutterSecureStorage();
   late  Mission  m;
   @override
   void initState() {
@@ -478,51 +479,52 @@ class _AccidentImagesState extends State<AccidentImages> {
   }
 
   Future<void> _pickImageFromGallery(String name) async {
+    final token = await box.read(key: "token"); // yo
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery , imageQuality: 50);
     if (pickedFile != null) {
       if(name=="appPicturesGeneral"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name,token.toString(), m.accidentId);
 
         setState(() => this._imageFile1= File(pickedFile.path));
       }
       if(name=="appPicturesCarDamage"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile2= File(pickedFile.path));
 
       }
       if(name=="appPicturesTPPolicy"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name,token.toString(), m.accidentId);
 
         setState(() => this._imageFile3= File(pickedFile.path));
 
       }
       if(name=="appPicturesDLvr1"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile4= File(pickedFile.path));
 
       }
       if(name=="appPicturesDLvr2"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name,token.toString(), m.accidentId);
 
         setState(() => this._imageFile5= File(pickedFile.path));
 
       }
       if(name=="appPicturesOptional1"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile6= File(pickedFile.path));
 
       }
       if(name=="appPicturesOptional2"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile7= File(pickedFile.path));
 
       }
       if(name=="appPicturesOptional3"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile8= File(pickedFile.path));
 
@@ -532,54 +534,57 @@ class _AccidentImagesState extends State<AccidentImages> {
   }
 
   Future<void> _pickImageFromCamera(String name ) async {
+
     final pickedFile = await _picker.pickImage(source: ImageSource.camera , imageQuality: 50);
+    final token = await box.read(key: "token"); // yo
+
     if (pickedFile != null) {
       if(name=="appPicturesGeneral"){
         log("pppppppppppp");
         log("picture"+ pickedFile.path);
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile1= File(pickedFile.path));
 
       }
       if(name=="appPicturesCarDamage"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile2= File(pickedFile.path));
 
       }
       if(name=="appPicturesTPPolicy"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile3= File(pickedFile.path));
 
       }
       if(name=="appPicturesDLvr1"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile4= File(pickedFile.path));
 
       }
       if(name=="appPicturesDLvr2"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile5= File(pickedFile.path));
 
       }
       if(name=="appPicturesOptional1"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile6= File(pickedFile.path));
 
       }
       if(name=="appPicturesOptional2"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile7= File(pickedFile.path));
 
       }
       if(name=="appPicturesOptional3"){
-        await TemaServiceApi().uploadImage(pickedFile.path, name, box.read('token'), m.accidentId);
+        await TemaServiceApi().uploadImage(pickedFile.path, name, token.toString(), m.accidentId);
 
         setState(() => this._imageFile8= File(pickedFile.path));
 
@@ -588,11 +593,13 @@ class _AccidentImagesState extends State<AccidentImages> {
     }
   }
   void getAccPictures() async{
+    final token = await box.read(key: "token"); // yo
+
     setState(() {
       loaded=true;
     });
 
-    appPictures =await TemaServiceApi().getAccPictures(box.read('token'), m.accidentId);
+    appPictures =await TemaServiceApi().getAccPictures(token.toString(), m.accidentId);
     loaded=false;
 
     setState(() {

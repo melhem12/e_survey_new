@@ -1,8 +1,10 @@
 class AppUrl {
 
-  static const String baseUrl = 'http://192.168.146.1:8087/api/v1';
+  static const String baseUrl = 'http://192.168.0.50:8087/v1/api/tema';
 
-  static const String login = baseUrl + '/auth/login';
+  static const String login = 'http://192.168.0.50:8001/v1/api/auth/login';
+  static const String  refresh_token_app = 'http://192.168.0.50:8001/v1/api/auth/refresh-token-app';
+
  // static const String forgotPassword = baseUrl + '/forgot_password';
   static const String dailySurvey = baseUrl + '/esurveyController/getDailySurvey?userId=';
   static const String surveyCount = baseUrl + '/esurveyController/getSurveyCount?userId=';
@@ -37,28 +39,28 @@ class AppUrl {
 
   static const String policyTypes = baseUrl + '/constant/getPolicyType';
   static const String insuranceCompanies = baseUrl + '/constant/getInsuranceCompany';
-  static const String missions = baseUrl + '/temaController/missions';
-  static const String updateAccidentStatus = baseUrl + '/temaController/updateAccidentStatus';
-  static const String updateArrivedStatus = baseUrl + '/temaController/updateArrivedStatus';
-  static const String accidentConditions = baseUrl + '/temaController/accidentConditions';
-  static const String damageCap = baseUrl + '/temaController/damageCap';
-  static const String responsabilities = baseUrl + '/temaController/responsabilities';
-  static const String doubts = baseUrl + '/temaController/doubts';
-  static const String insertAccidentConditions = baseUrl + '/temaController/insertAccidentConditions';
+  static const String missions = baseUrl + '/missions';
+  static const String updateAccidentStatus = baseUrl + '/updateAccidentStatus';
+  static const String updateArrivedStatus = baseUrl + '/updateArrivedStatus';
+  static const String accidentConditions = baseUrl + '/accidentConditions';
+  static const String damageCap = baseUrl + '/damageCap';
+  static const String responsabilities = baseUrl + '/responsabilities';
+  static const String doubts = baseUrl + '/doubts';
+  static const String insertAccidentConditions = baseUrl + '/insertAccidentConditions';
 
-  static const String uploadAccidentPicturesToDatabase = baseUrl + '/temaController/uploadAccidentPicturesToDatabase';
-  static const String getAccPictures = baseUrl + '/temaController/getAccPictures';
-  static const String getNotes = baseUrl + '/temaController/getNotes';
+  static const String uploadAccidentPicturesToDatabase = baseUrl + '/uploadAccidentPicturesToDatabase';
+  static const String getAccPictures = baseUrl + '/getAccPictures';
+  static const String getNotes = baseUrl + '/getNotes';
 
-  static const String getCarsAppBodly = baseUrl + '/temaController/getCarsAppBodly';
-  static const String updateCarsAppBodly = baseUrl + '/temaController/updateCarsAppBodly';
-  static const String uploadNotes = baseUrl + '/temaController/uploadNotes';
-  static const String updateGeoLocation = baseUrl + '/temaController/updateGeoLocation';
-  static const String updateGeoStatus = baseUrl + '/temaController/updateGeoStatus';
-  static const String updateCarsAppDamageParts = baseUrl + '/temaController/updateCarsAppDamageParts';
-  static const String updateCarsAppDamagePartsPic = baseUrl + '/temaController/updateCarsAppDamagePartsPic';
+  static const String getCarsAppBodly = baseUrl + '/getCarsAppBodly';
+  static const String updateCarsAppBodly = baseUrl + '/updateCarsAppBodly';
+  static const String uploadNotes = baseUrl + '/uploadNotes';
+  static const String updateGeoLocation = baseUrl + '/updateGeoLocation';
+  static const String updateGeoStatus = baseUrl + '/updateGeoStatus';
+  static const String updateCarsAppDamageParts = baseUrl + '/updateCarsAppDamageParts';
+  static const String updateCarsAppDamagePartsPic = baseUrl + '/updateCarsAppDamagePartsPic';
 
-  static const String getCarsAppDamageParts = baseUrl + '/temaController/getCarsAppDamageParts';
+  static const String getCarsAppDamageParts = baseUrl + '/getCarsAppDamageParts';
 
 
 

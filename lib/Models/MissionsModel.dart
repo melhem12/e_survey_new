@@ -17,7 +17,7 @@ class MissonsModel {
   List<Mission> missions;
 
   factory MissonsModel.fromJson(Map<String, dynamic> json) => MissonsModel(
-    missions: List<Mission>.from(json["missions"].map((x) => Mission.fromJson(x))),
+    missions: List<Mission>.from(json["data"].map((x) => Mission.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {

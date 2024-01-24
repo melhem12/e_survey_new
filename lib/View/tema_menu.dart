@@ -1,6 +1,7 @@
 import 'package:e_survey/View/AccidentInfo.dart';
 import 'package:e_survey/View/accidentConditions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -14,7 +15,7 @@ class TemaMenu extends StatefulWidget {
 
 class _TemaMenuState extends State<TemaMenu> {
   late  Mission m  ;
-  final box = GetStorage();
+  final box = FlutterSecureStorage();
   @override
   void initState() {
     m =  Get.arguments as Mission ;

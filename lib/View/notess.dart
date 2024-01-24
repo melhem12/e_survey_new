@@ -7,9 +7,9 @@ import 'dart:async';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:e_survey/View/expert_missions.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
@@ -21,6 +21,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../Models/AppNotes.dart';
 import '../Models/MissionsModel.dart';
 import 'expert_missions2.dart';
+
 class NotessView extends StatefulWidget {
   const NotessView({Key? key}) : super(key: key);
 
@@ -43,12 +44,15 @@ typedef _Fn = void Function();
 //const theSource = AudioSource.voiceDownlink;
 
 const theSource = AudioSource.microphone;
+
 class _NotessViewState extends State<NotessView> {
-  AppNotes appNotes = AppNotes(notesId: '', carsAppAccidentId: '', notesRemark: '', voiceNote: '');
+  AppNotes appNotes = AppNotes(
+      notesId: '', carsAppAccidentId: '', notesRemark: '', voiceNote: '');
 
   final _controller = TextEditingController();
-  bool progress=false;
+  bool progress = false;
   late Mission m;
+  final box = FlutterSecureStorage();
 
   Codec _codec = Codec.aacMP4;
   String _mPath = '';
@@ -60,11 +64,10 @@ class _NotessViewState extends State<NotessView> {
 
   @override
   void initState() {
-
-    m =  Get.arguments as Mission ;
+    m = Get.arguments as Mission;
     // _mPath=_mPath+m.accidentId+".mp4";
 
-    progress =true;
+    progress = true;
     getNotes();
 
     _mPlayer!.openPlayer().then((value) {
@@ -80,6 +83,7 @@ class _NotessViewState extends State<NotessView> {
     });
     super.initState();
   }
+
   @override
   void dispose() {
     _mPlayer!.closePlayer();
@@ -98,7 +102,8 @@ class _NotessViewState extends State<NotessView> {
       }
     }
     // Initialize _mPath with the appropriate directory path
-    final appDocumentsDirectory = await path_provider.getApplicationDocumentsDirectory();
+    final appDocumentsDirectory =
+        await path_provider.getApplicationDocumentsDirectory();
     _mPath = '${appDocumentsDirectory.path}/tau_file.mp4';
     await _mRecorder!.openRecorder();
     if (!await _mRecorder!.isEncoderSupported(_codec) && kIsWeb) {
@@ -113,11 +118,11 @@ class _NotessViewState extends State<NotessView> {
     await session.configure(AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
       avAudioSessionCategoryOptions:
-      AVAudioSessionCategoryOptions.allowBluetooth |
-      AVAudioSessionCategoryOptions.defaultToSpeaker,
+          AVAudioSessionCategoryOptions.allowBluetooth |
+              AVAudioSessionCategoryOptions.defaultToSpeaker,
       avAudioSessionMode: AVAudioSessionMode.spokenAudio,
       avAudioSessionRouteSharingPolicy:
-      AVAudioSessionRouteSharingPolicy.defaultPolicy,
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
       avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
       androidAudioAttributes: const AndroidAudioAttributes(
         contentType: AndroidAudioContentType.speech,
@@ -161,17 +166,13 @@ class _NotessViewState extends State<NotessView> {
         _mPlayer!.isStopped);
     _mPlayer!
         .startPlayer(
-        fromURI: _mPath,
-        //codec: kIsWeb ? Codec.opusWebM : Codec.aacADTS,
-        whenFinished: () {
-
-          setState(() {});
-        })
+            fromURI: _mPath,
+            //codec: kIsWeb ? Codec.opusWebM : Codec.aacADTS,
+            whenFinished: () {
+              setState(() {});
+            })
         .then((value) {
-
-      setState(() {
-
-      });
+      setState(() {});
     });
   }
 
@@ -180,6 +181,7 @@ class _NotessViewState extends State<NotessView> {
       setState(() {});
     });
   }
+
   int _countWords({required String text}) {
     final trimmedText = text.trim();
     if (trimmedText.isEmpty) {
@@ -205,12 +207,11 @@ class _NotessViewState extends State<NotessView> {
     return _mPlayer!.isStopped ? play : stopPlayer;
   }
 
-
   void getNotes() async {
-
-    appNotes=  await TemaServiceApi().getNotes(GetStorage().read('token'), m.accidentId);
-    progress =false;
-    _controller.text=appNotes.notesRemark;
+    final token = await box.read(key: "token");
+    appNotes = await TemaServiceApi().getNotes(token.toString(), m.accidentId);
+    progress = false;
+    _controller.text = appNotes.notesRemark;
 //audioPlayer.playBytes(base64Decode(appNotes.voiceNote));
 //File f= File.fromRawPath(base64Decode(appNotes.voiceNote));
     log(appNotes.voiceNote);
@@ -220,9 +221,9 @@ class _NotessViewState extends State<NotessView> {
     // Directory documentDirectory = await getApplicationCacheDirectory();
     // String audioFilePath = '${documentDirectory.path}/${_mPath}';
 
-
-    if(appNotes.voiceNote!=""||appNotes.voiceNote.isNotEmpty){
-      final appDocumentsDirectory = await path_provider.getApplicationDocumentsDirectory();
+    if (appNotes.voiceNote != "" || appNotes.voiceNote.isNotEmpty) {
+      final appDocumentsDirectory =
+          await path_provider.getApplicationDocumentsDirectory();
       _mPath = '${appDocumentsDirectory.path}/tau_file.mp4';
 
       log("kkkkkkkkkkkkkkkkknnnnnnnnnnnn");
@@ -232,9 +233,10 @@ class _NotessViewState extends State<NotessView> {
       //
       // }
 
-     File f=  await File(_mPath).writeAsBytes(base64Decode(appNotes.voiceNote)) as File;
-     _mRecorderIsInited = true;
-     _mplaybackReady=true;
+      File f = await File(_mPath).writeAsBytes(base64Decode(appNotes.voiceNote))
+          as File;
+      _mRecorderIsInited = true;
+      _mplaybackReady = true;
       //  file.writeAsBytesCompat(base64Decode(appNotes.voiceNote));
       log("nfffffff");
     }
@@ -243,305 +245,308 @@ class _NotessViewState extends State<NotessView> {
     //   await   audioPlayer.play(audioFile!.path, isLocal: true);
     //esp
     // }
-    progress=false;
+    progress = false;
 
-    setState((){});
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     Widget makeBody() {
-      return
+      return progress
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Center(
+                  child: Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      child: Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              _buildMultilineTextField(),
+                              //
+                              // Container(
+                              //   margin: const EdgeInsets.all(3),
+                              //   padding: const EdgeInsets.all(3),
+                              //   height: 80,
+                              //   width: double.infinity,
+                              //   alignment: Alignment.center,
+                              //   decoration: BoxDecoration(
+                              //     color: Color(0xFFFAF0E6),
+                              //     border: Border.all(
+                              //       color: Colors.indigo,
+                              //       width: 3,
+                              //     ),
+                              //   ),
+                              //   child: Row(children: [
+                              //     ElevatedButton(
+                              //       onPressed: getRecorderFn(),
+                              //       //color: Colors.white,
+                              //       //disabledColor: Colors.grey,
+                              //       child: Icon(_mRecorder!.isRecording ? Icons.stop : Icons.mic),
+                              //     ),
+                              //     SizedBox(
+                              //       width: 20,
+                              //     ),
+                              //     Text(_mRecorder!.isRecording
+                              //         ? 'Recording in progress'
+                              //         : 'Recorder is stopped'),
+                              //   ]),
+                              // ),
+                              // Container(
+                              //   margin: const EdgeInsets.all(3),
+                              //   padding: const EdgeInsets.all(3),
+                              //   height: 80,
+                              //   width: double.infinity,
+                              //   alignment: Alignment.center,
+                              //   decoration: BoxDecoration(
+                              //     color: Color(0xFFFAF0E6),
+                              //     border: Border.all(
+                              //       color: Colors.indigo,
+                              //       width: 3,
+                              //     ),
+                              //   ),
+                              //   child: Row(children: [
+                              //     ElevatedButton(
+                              //       onPressed: getPlaybackFn(),
+                              //       //color: Colors.white,
+                              //       //disabledColor: Colors.grey,
+                              //       child: Icon(_mPlayer!.isPlaying ? Icons.pause : Icons.play_arrow),
+                              //     ),
+                              //     SizedBox(
+                              //       width: 20,
+                              //     ),
+                              //     Text(_mPlayer!.isPlaying
+                              //         ? 'Playback in progress'
+                              //         : 'Player is stopped'),
+                              //   ]),
+                              // ),
 
-        progress?Center(child: CircularProgressIndicator(),):
-
-        SingleChildScrollView( child :
-        Center(
-            child:
-            Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildMultilineTextField(),
-                        //
-                        // Container(
-                        //   margin: const EdgeInsets.all(3),
-                        //   padding: const EdgeInsets.all(3),
-                        //   height: 80,
-                        //   width: double.infinity,
-                        //   alignment: Alignment.center,
-                        //   decoration: BoxDecoration(
-                        //     color: Color(0xFFFAF0E6),
-                        //     border: Border.all(
-                        //       color: Colors.indigo,
-                        //       width: 3,
-                        //     ),
-                        //   ),
-                        //   child: Row(children: [
-                        //     ElevatedButton(
-                        //       onPressed: getRecorderFn(),
-                        //       //color: Colors.white,
-                        //       //disabledColor: Colors.grey,
-                        //       child: Icon(_mRecorder!.isRecording ? Icons.stop : Icons.mic),
-                        //     ),
-                        //     SizedBox(
-                        //       width: 20,
-                        //     ),
-                        //     Text(_mRecorder!.isRecording
-                        //         ? 'Recording in progress'
-                        //         : 'Recorder is stopped'),
-                        //   ]),
-                        // ),
-                        // Container(
-                        //   margin: const EdgeInsets.all(3),
-                        //   padding: const EdgeInsets.all(3),
-                        //   height: 80,
-                        //   width: double.infinity,
-                        //   alignment: Alignment.center,
-                        //   decoration: BoxDecoration(
-                        //     color: Color(0xFFFAF0E6),
-                        //     border: Border.all(
-                        //       color: Colors.indigo,
-                        //       width: 3,
-                        //     ),
-                        //   ),
-                        //   child: Row(children: [
-                        //     ElevatedButton(
-                        //       onPressed: getPlaybackFn(),
-                        //       //color: Colors.white,
-                        //       //disabledColor: Colors.grey,
-                        //       child: Icon(_mPlayer!.isPlaying ? Icons.pause : Icons.play_arrow),
-                        //     ),
-                        //     SizedBox(
-                        //       width: 20,
-                        //     ),
-                        //     Text(_mPlayer!.isPlaying
-                        //         ? 'Playback in progress'
-                        //         : 'Player is stopped'),
-                        //   ]),
-                        // ),
-
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: getRecorderFn(),
-                                child: Icon(
-                                  _mRecorder!.isRecording
-                                      ? Icons.stop
-                                      : Icons.mic,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 20),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: getPlaybackFn(),
-                                child: Icon(
-                                  _mPlayer!.isPlaying
-                                      ? Icons.pause
-                                      : Icons.play_arrow,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                          width: double.infinity,
-                        ),
-
-                        Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Expanded(
-                                  flex: 1,
-                                  child: Container(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
                                     child: ElevatedButton(
-                                      child: Text(
-                                        "عودة",style: TextStyle(color: Colors.white ,fontSize: 17),
+                                      onPressed: getRecorderFn(),
+                                      child: Icon(
+                                        _mRecorder!.isRecording
+                                            ? Icons.stop
+                                            : Icons.mic,
                                       ),
-                                      onPressed: () async {
-
-                                        // TemaServiceApi tema = new TemaServiceApi();
-                                        //await tema.updateAccidentStatus("rejected", m.accidentId, box.read("token").toString());
-
-                                        progress=true;
-                                        setState((){
-                                        });
-
-                                          Directory documentDirectory = await getApplicationCacheDirectory();
-                                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
-                                          await TemaServiceApi().uploadNotes( _mPath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-
-
-                                        progress=false;
-                                        setState((){
-                                        });
-                                        Get.back(result: 'hello');
-
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.blue,
-                                          textStyle: TextStyle(
-                                              fontSize: 30,
-                                              fontWeight:
-                                              FontWeight.bold)),
                                     ),
-                                  )),
-                              SizedBox(
-                                width: 20,
+                                  ),
+                                  SizedBox(width: 20),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: getPlaybackFn(),
+                                      child: Icon(
+                                        _mPlayer!.isPlaying
+                                            ? Icons.pause
+                                            : Icons.play_arrow,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               SizedBox(
                                 height: 20,
+                                width: double.infinity,
                               ),
-                              Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    child: ElevatedButton(
-                                      child: Text(
-                                        "حفظ",style: TextStyle(color: Colors.white
-                                          ,fontSize: 17),
-                                      ),
-                                      onPressed: () async {
-                                        progress=true;
-                                        setState((){
-                                        });
 
-                                          Directory documentDirectory = await getApplicationCacheDirectory();
-                                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
-                                          print('nfokhoooooooooooooooooo       ${audioFilePath}');
-                                          await TemaServiceApi().uploadNotes( _mPath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
+                              Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          child: ElevatedButton(
+                                            child: Text(
+                                              "عودة",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 17),
+                                            ),
+                                            onPressed: () async {
+                                              // TemaServiceApi tema = new TemaServiceApi();
+                                              //await tema.updateAccidentStatus("rejected", m.accidentId, box.read("token").toString());
 
+                                              progress = true;
+                                              setState(() {});
 
+                                              Directory documentDirectory =
+                                                  await getApplicationCacheDirectory();
+                                              String audioFilePath =
+                                                  '${documentDirectory.path}/${_mPath}';
 
-                                        progress=false;
-                                        setState((){
-                                        });
+                                              final token =
+                                                  await box.read(key: "token");
+                                              await TemaServiceApi()
+                                                  .uploadNotes(
+                                                      _mPath,
+                                                      _controller.text
+                                                          .toString(),
+                                                      token.toString(),
+                                                      m.accidentId);
+
+                                              progress = false;
+                                              setState(() {});
+                                              Get.back(result: 'hello');
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                primary: Colors.blue,
+                                                textStyle: TextStyle(
+                                                    fontSize: 30,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                        )),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          child: ElevatedButton(
+                                            child: Text(
+                                              "حفظ",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 17),
+                                            ),
+                                            onPressed: () async {
+                                              progress = true;
+                                              setState(() {});
+
+                                              Directory documentDirectory =
+                                                  await getApplicationCacheDirectory();
+                                              String audioFilePath =
+                                                  '${documentDirectory.path}/${_mPath}';
+                                              final token =
+                                                  await box.read(key: "token");
+
+                                              await TemaServiceApi()
+                                                  .uploadNotes(
+                                                      _mPath,
+                                                      _controller.text
+                                                          .toString(),
+                                                      token.toString(),
+                                                      m.accidentId);
+
+                                              progress = false;
+                                              setState(() {});
 //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-                                        // Get.to(ArrivationVerification(),arguments: m);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.blue,
-                                          textStyle: TextStyle(
-                                              fontSize: 30,
-                                              fontWeight:
-                                              FontWeight.bold)),
-                                    ),
-                                  ))
-                            ]
-                        ),
-                        Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
+                                              // Get.to(ArrivationVerification(),arguments: m);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                primary: Colors.blue,
+                                                textStyle: TextStyle(
+                                                    fontSize: 30,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                        ))
+                                  ]),
+                              Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Expanded(
+                                        flex: 1,
+                                        child: Container(
+                                          child: ElevatedButton(
+                                            child: Text(
+                                              "حفظ وإنهاء",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 17),
+                                            ),
+                                            onPressed: () async {
+                                              progress = true;
+                                              setState(() {});
 
-                              Expanded(
-                                  flex: 1,
-                                  child: Container(
-                                    child: ElevatedButton(
-                                      child: Text(
-                                        "حفظ وإنهاء",style: TextStyle(color: Colors.white
-                                          ,fontSize: 17),
-                                      ),
-                                      onPressed: () async {
-                                        progress = true;
-                                        setState((){
+                                              Directory documentDirectory =
+                                                  await getApplicationCacheDirectory();
+                                              String audioFilePath =
+                                                  '${documentDirectory.path}/${_mPath}';
+                                              final token =
+                                                  await box.read(key: "token");
 
-                                        });
+                                              await TemaServiceApi()
+                                                  .uploadNotes(
+                                                      _mPath,
+                                                      _controller.text
+                                                          .toString(),
+                                                      token.toString(),
+                                                      m.accidentId);
+                                              await TemaServiceApi()
+                                                  .updateAccidentStatus(
+                                                      context,
+                                                      "completed",
+                                                      m.accidentId,
+                                                      token.toString());
 
-
-                                          Directory documentDirectory = await getApplicationCacheDirectory();
-                                          String audioFilePath = '${documentDirectory.path}/${_mPath}';
-                                          print('nfokhoooooooooooooooooo       ${audioFilePath}');
-                                          await TemaServiceApi().uploadNotes( _mPath , _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-                                          await TemaServiceApi().updateAccidentStatus("completed", m.accidentId, GetStorage().read('token'));
-
-
-                                        progress = false;
-                                        setState((){
-
-                                        });
-                                        Platform.isIOS?
-                                        Get.offAll(()=>ExpertMissions2()):
-                                        Get.offAll(()=>ExpertMissions());
-                                        //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-                                        // Get.to(ArrivationVerification(),arguments: m);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          primary: Colors.blue,
-                                          textStyle: TextStyle(
-                                              fontSize: 30,
-                                              fontWeight:
-                                              FontWeight.bold)),
-                                    ),
-                                  ))
-                            ]
-                        ),
-
-
-
-
-
-
-
-
-
-
-                      ],
-                    )))));
+                                              progress = false;
+                                              setState(() {});
+                                              Platform.isIOS
+                                                  ? Get.offAll(
+                                                      () => ExpertMissions2())
+                                                  : Get.offAll(
+                                                      () => ExpertMissions());
+                                              //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
+                                              // Get.to(ArrivationVerification(),arguments: m);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                                primary: Colors.blue,
+                                                textStyle: TextStyle(
+                                                    fontSize: 30,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                          ),
+                                        ))
+                                  ]),
+                            ],
+                          )))));
     }
 
+    return WillPopScope(
+        onWillPop: () async {
+          progress = true;
+          setState(() {});
 
+          Directory documentDirectory = await getApplicationCacheDirectory();
+          String audioFilePath = '${documentDirectory.path}/${_mPath}';
+          final token = await box.read(key: "token");
 
+          await TemaServiceApi().uploadNotes(_mPath,
+              _controller.text.toString(), token.toString(), m.accidentId);
 
-    return
-
-
-      WillPopScope (
-          onWillPop: (
-
-              )  async {
-            progress=true;
-            setState(() {
-
-            });
-
-              Directory documentDirectory = await getApplicationCacheDirectory();
-              String audioFilePath = '${documentDirectory.path}/${_mPath}';
-              await TemaServiceApi().uploadNotes(_mPath, _controller.text.toString(), GetStorage().read('token'), m.accidentId);
-              print("kkkkkkkkkkkkkkkkkkkkkk");
-
-            progress=false;
-            setState(() {
-
-            });
-            return true;
-          },
-          child :
-
-          Scaffold(
-            appBar: AppBar(title: const Text("ملاحظات"),),
-
-            body: makeBody(),
-          ));
+          progress = false;
+          setState(() {});
+          return true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("ملاحظات"),
+          ),
+          body: makeBody(),
+        ));
   }
 
   Widget _buildMultilineTextField() {
     return Directionality(
         textDirection: TextDirection.rtl,
-        child:
-        TextField(
+        child: TextField(
           textAlign: TextAlign.right,
-
           controller: this._controller,
           maxLines: 5,
           textCapitalization: TextCapitalization.sentences,
@@ -556,18 +561,4 @@ class _NotessViewState extends State<NotessView> {
           onChanged: (text) => setState(() {}),
         ));
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

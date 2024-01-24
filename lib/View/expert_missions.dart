@@ -11,6 +11,7 @@ import 'package:e_survey/ViewModels/MissionsViewModel.dart';
 import 'package:e_survey/service/TemaServiceApi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,13 +19,11 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:android_intent/android_intent.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-// The callback function should always be a top-level function.
+import '../pages/signin.dart';
+
 void startCallback() {
-  // The setTaskHandler function must be called to handle the task in the background.
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
-
-
 
 class ExpertMissions extends StatefulWidget {
   const ExpertMissions({Key? key}) : super(key: key);
@@ -35,127 +34,149 @@ class ExpertMissions extends StatefulWidget {
 
 class _ExpertMissionsState extends State<ExpertMissions> {
   late Position _position;
+
+  // final box = GetStorage();
+  // String token = "";
+  // String? filter;
+  // ReceivePort? _receivePort;
+  //
+  // final storage = new FlutterSecureStorage();
+  //
+  // ScrollController _scrollController = ScrollController();
+  //
+  //
+  // MissionsViewModel? controller;
+
+  // Position? _position;  // Made nullable
   final box = GetStorage();
-   String token="";
+  String token = "";
   String? filter;
   ReceivePort? _receivePort;
-  final MissionsViewModel controller =
-  Get.put(MissionsViewModel(initialToken: GetStorage().read("token")));
-
-//  ExpertMissions({Key? key}) : super(key: key);
-
+  final storage = FlutterSecureStorage();
+  ScrollController _scrollController = ScrollController();
+  MissionsViewModel? controller; // Already nullable
 
   @override
   void initState() {
-    FirebaseMessaging.instance
-        .subscribeToTopic(box.read("userId").toString());
     super.initState();
+    _initTokenAndController();
 
-token=box.read("token");
-    // _initForegroundTask();
-    // _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
-    //   // You can get the previous ReceivePort without restarting the service.
-    //   if (await FlutterForegroundTask.isRunningService) {
-    //     final newReceivePort = await FlutterForegroundTask.receivePort;
-    //     _registerReceivePort(newReceivePort);
-    //   }
-    // });
+    _scrollController.addListener(_onScroll);
+    getPosition();
+    _setupFirebaseMessaging();
+    _setupForegroundTask();
+    _setupPeriodicUpdates();
+  }
 
+  void _setupFirebaseMessaging() {
+    String userId = box.read("userId").toString();
+    FirebaseMessaging.instance.subscribeToTopic(userId);
+  }
+
+  void _setupForegroundTask() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _requestPermissionForAndroid();
       _initForegroundTask();
-
-      // You can get the previous ReceivePort without restarting the service.
       if (await FlutterForegroundTask.isRunningService) {
         final newReceivePort = FlutterForegroundTask.receivePort;
         _registerReceivePort(newReceivePort);
       }
     });
-    print("///////////KKKKKKKKLLLLL");
+  }
 
-    getPosition();
-    Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
-      // if (!_isRunning) {
-      //   timer.cancel();
-      // }
-      controller.getData(GetStorage().read('token'));
-      _position=   await getLatAndLong();
-      await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+  void _setupPeriodicUpdates() {
+    Timer.periodic(const Duration(seconds: 200), (Timer timer) async {
+      controller?.getData(token);
+      Position? currentPosition = await getLatAndLong();
+      if (currentPosition != null) {
+        await TemaServiceApi().updateGeoLocation(
+            currentPosition.latitude.toString(), currentPosition.longitude.toString(), token);
+      }
     });
   }
+
+
+  void _initTokenAndController() async {
+    TemaServiceApi().refreshToken();
+    String? storedToken = await storage.read(key: "token");
+    if (storedToken != null) {
+      setState(() {
+        token = storedToken;
+        controller = Get.put(MissionsViewModel(initialToken: token));
+      });
+    }
+  }
+
   Timer scheduleTimeout([int milliseconds = 10000]) =>
       Timer(Duration(milliseconds: milliseconds), handleTimeout);
+
   void handleTimeout() {
     log("kkkkkkkkkkkkkkkkkkkkk");
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      if (controller != null) {
+        // Null check added
+        controller!.currentPage++;
+        controller!
+            .getData(controller!.initialToken, page: controller!.currentPage);
+      }
+    }
+  }
+
+  Future<void> logout() async {
+    await storage.delete(key: "token");
+    await storage.delete(key: "refresh_token");
+
+    box.remove("userId");
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Signin()));
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     var drawerHeader = UserAccountsDrawerHeader(
       accountName: Text(GetStorage().read("userId")),
       accountEmail: Text(box.read("userId")),
       currentAccountPicture: CircleAvatar(
         backgroundColor: Colors.white,
-        child: Icon(Icons.person ,size: 65,color: Colors.blue,),
+        child: Icon(
+          Icons.person,
+          size: 65,
+          color: Colors.blue,
+        ),
       ),
-      // otherAccountsPictures: <Widget>[
-      //   CircleAvatar(
-      //     backgroundColor: Colors.yellow,
-      //     child: Text('A'),
-      //   ),
-      //   CircleAvatar(
-      //     backgroundColor: Colors.red,
-      //     child: Text('B'),
-      //   )
-      // ],
     );
     final drawerItems = ListView(
       children: <Widget>[
         drawerHeader,
-        // ListTile(
-        //   title:  Row(
-        //     children: <Widget>[
-        //       SizedBox(width: 5,),
-        //       Icon(Icons.home),
-        //       Text('Home'),
-        //
-        //     ],
-        //   ),
-        //
-        //   onTap: () => Navigator.of(context).pushNamed('/home'),
-        //
-        // ),
         ListTile(
-            title:  Row(
+            title: Row(
               children: <Widget>[
-                SizedBox(width: 5,),
+                SizedBox(
+                  width: 5,
+                ),
                 Icon(Icons.exit_to_app),
-                SizedBox(width: 5,),
+                SizedBox(
+                  width: 5,
+                ),
                 Text('Logout'),
-
               ],
             ),
-
-            onTap: () async => {
-              Navigator.of(context).pushNamed('/'),
-box.erase(),
-            }
-        ),
-
+            onTap: () async => {logout()}),
       ],
     );
 
-    return WithForegroundTask(  child : Scaffold(
+    return WithForegroundTask(
+        child: Scaffold(
       drawer: Drawer(
         child: drawerItems,
       ),
-      bottomNavigationBar: GetStorage().read('status')=="on"?_bottomBar():_bottomBarRed(),
+      bottomNavigationBar:
+          GetStorage().read('status') == "on" ? _bottomBar() : _bottomBarRed(),
       appBar: AppBar(
-
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -163,43 +184,31 @@ box.erase(),
             InkWell(
                 child: const Icon(Icons.refresh_outlined),
                 onTap: () {
-                  controller.getData(GetStorage().read("token"));
+                  controller?.refreshData();
                 })
           ],
         ),
         centerTitle: false,
         actions: <Widget>[
           PopupMenuButton<int>(
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 1,
-                child: Text("First"),
-              ),
-              const PopupMenuItem(
-                value: 2,
-                child: Text("Second"),
-              ),
-            ],
+            itemBuilder: (context) => [],
           )
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround, // <-- alignments
-
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Expanded(
               flex: 2,
               child: TextField(
-                onChanged : (String value)  {
+                onChanged: (String value) {
                   filter = value;
-                  if(value.trim().isNotEmpty){
-                    controller.searchMission(value);
-
-                  }
-                  else{
-                    controller.getData(GetStorage("token").toString());
+                  if (value.trim().isNotEmpty) {
+                    controller!.searchMission(value);
+                  } else {
+                    controller!.getData(token);
                   }
                 },
                 style: const TextStyle(
@@ -297,37 +306,37 @@ box.erase(),
             ),
             Expanded(
               flex: 17,
-              child: Obx(() {
-                if (controller.missions.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                child: Obx(() {
+                  if (controller?.missions.isEmpty ?? true) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
                 return ListView.builder(
+                    controller: _scrollController,
                     padding: const EdgeInsets.all(10.0),
-                    itemCount: controller.missions.length,
+                    itemCount: controller!.missions.length,
                     itemBuilder: (
-                        context,
-                        index,
-                        ) {
-                      final Mission mission = controller.missions[index];
-                      print('mission ${mission.accidentId}: ${mission.accidentStatus}');
+                      context,
+                      index,
+                    ) {
+                      final Mission mission = controller!.missions[index];
+                      print(
+                          'mission ${mission.accidentId}: ${mission.accidentStatus}');
                       return InkWell(
                         key: ValueKey(mission.accidentId),
 
                         onTap: () => {
                           if (mission.accidentStatus.toString() == "new")
                             {_navigateAndRefresh(context, mission)}
-                          else if(mission.accidentStatus.toString() == "accepted"){
-                            if(mission.accdentArrivedStatus==true){
-                              Get.to(TemaMenu(),arguments: mission)
-
-                            }else{
-                              Get.to(AcceptedMission(),arguments: mission)
-
+                          else if (mission.accidentStatus.toString() ==
+                              "accepted")
+                            {
+                              if (mission.accdentArrivedStatus == true)
+                                {Get.to(TemaMenu(), arguments: mission)}
+                              else
+                                {Get.to(AcceptedMission(), arguments: mission)}
                             }
-                          }
-                        }
-                        ,
+                        },
                         //
                         child: Card(
                           elevation: 5,
@@ -340,23 +349,22 @@ box.erase(),
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                    mission.accidentCustomerName.toString(),
+                                Text(mission.accidentCustomerName.toString(),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color:
-                                        mission.accidentStatus.toString() ==
-                                            "new"
-                                            ? Colors.green
-                                            : mission.accidentStatus
-                                            .toString() ==
-                                            "rejected"
-                                            ? Colors.red
-                                            : mission.accidentStatus
-                                            .toString() ==
-                                            "accepted"
-                                            ? Colors.blue
-                                            : Colors.grey)),
+                                            mission.accidentStatus.toString() ==
+                                                    "new"
+                                                ? Colors.green
+                                                : mission.accidentStatus
+                                                            .toString() ==
+                                                        "rejected"
+                                                    ? Colors.red
+                                                    : mission.accidentStatus
+                                                                .toString() ==
+                                                            "accepted"
+                                                        ? Colors.blue
+                                                        : Colors.grey)),
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -367,17 +375,17 @@ box.erase(),
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: mission.accidentStatus
-                                          .toString() ==
-                                          "new"
+                                                  .toString() ==
+                                              "new"
                                           ? Colors.green
                                           : mission.accidentStatus.toString() ==
-                                          "rejected"
-                                          ? Colors.red
-                                          : mission.accidentStatus
-                                          .toString() ==
-                                          "accepted"
-                                          ? Colors.blue
-                                          : Colors.grey),
+                                                  "rejected"
+                                              ? Colors.red
+                                              : mission.accidentStatus
+                                                          .toString() ==
+                                                      "accepted"
+                                                  ? Colors.blue
+                                                  : Colors.grey),
                                 ),
                               ],
                             ),
@@ -389,125 +397,32 @@ box.erase(),
             ),
 
             // _buildContentView(),
-
           ],
         ),
-
       ),
-    )
-    );
+    ));
   }
-  // Widget _buildContentView() {
-  //   buttonBuilder(String text, {VoidCallback? onPressed}) {
-  //     return ElevatedButton(
-  //       child: Text(text),
-  //       onPressed: onPressed,
-  //     );
-  //   }
-  //
-  //   return Center(
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       children: [
-  //         buttonBuilder('start', onPressed:() async {
-  //           print("start ................");
-  //           await TemaServiceApi().updateGeoStatus("available", GetStorage().read("token").toString());
-  //
-  //           _startForegroundTask() ;
-  //
-  //
-  //         }
-  //         ),
-  //         buttonBuilder('stop', onPressed:() async {
-  //           _stopForegroundTask();
-  //           await TemaServiceApi().updateGeoStatus("notAvailable", GetStorage().read("token"));
-  //
-  //         } ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-//   open(Mission mission , context) {
-// if(mission.accidentStatus=="new"){
-//  // Get.toNamed("/newMission");
-//   Get.to(NewMission());
-// //Navigator.push(context, NewMission());
-// }
-
-
-
-
-
-
-
-  // Future<void> _initForegroundTask() async {
-  //   FlutterForegroundTask.init(
-  //       androidNotificationOptions: AndroidNotificationOptions(
-  //         channelId: 'notification_channel_id',
-  //         channelName: 'Foreground Notification',
-  //         channelDescription:
-  //         'This notification appears when the foreground service is running.',
-  //         channelImportance: NotificationChannelImportance.DEFAULT,
-  //         priority: NotificationPriority.DEFAULT,
-  //         iconData: const NotificationIconData(
-  //           resType: ResourceType.mipmap,
-  //           resPrefix: ResourcePrefix.ic,
-  //           name: 'launcher',
-  //           backgroundColor: Colors.orange,
-  //         ),
-  //         buttons: [
-  //           const NotificationButton(id: 'geoTracker', text: 'geoTracker'),
-  //           const NotificationButton(id: 'testButton', text: 'Test'),
-  //         ],
-  //       ),
-  //       iosNotificationOptions: const IOSNotificationOptions(
-  //         showNotification: true,
-  //         playSound: true,
-  //       ),
-  //       foregroundTaskOptions: const ForegroundTaskOptions(
-  //         interval: 5000,
-  //         autoRunOnBoot: true,
-  //         allowWifiLock: true,
-  //       )
-  //   );
-  // }
-
 
   Future<void> _requestPermissionForAndroid() async {
     if (!Platform.isAndroid) {
       return;
     }
 
-    // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-    // onNotificationPressed function to be called.
-    //
-    // When the notification is pressed while permission is denied,
-    // the onNotificationPressed function is not called and the app opens.
-    //
-    // If you do not use the onNotificationPressed or launchApp function,
-    // you do not need to write this code.
     if (!await FlutterForegroundTask.canDrawOverlays) {
-      // This function requires `android.permission.SYSTEM_ALERT_WINDOW` permission.
       await FlutterForegroundTask.openSystemAlertWindowSettings();
     }
 
-    // Android 12 or higher, there are restrictions on starting a foreground service.
-    //
-    // To restart the service on device reboot or unexpected problem, you need to allow below permission.
     if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
-      // This function requires `android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission.
       await FlutterForegroundTask.requestIgnoreBatteryOptimization();
     }
 
     // Android 13 and higher, you need to allow notification permission to expose foreground service notification.
     final NotificationPermission notificationPermissionStatus =
-    await FlutterForegroundTask.checkNotificationPermission();
+        await FlutterForegroundTask.checkNotificationPermission();
     if (notificationPermissionStatus != NotificationPermission.granted) {
       await FlutterForegroundTask.requestNotificationPermission();
     }
   }
-
 
   void _initForegroundTask() {
     FlutterForegroundTask.init(
@@ -516,7 +431,7 @@ box.erase(),
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
         channelDescription:
-        'This notification appears when the foreground service is running.',
+            'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.HIGH,
         priority: NotificationPriority.HIGH,
         iconData: const NotificationIconData(
@@ -552,52 +467,6 @@ box.erase(),
     );
   }
 
-
-
-
-  // Future<bool> _startForegroundTask() async {
-  //   print("start fg service");
-  //   // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-  //   // onNotificationPressed function to be called.
-  //   //
-  //   // When the notification is pressed while permission is denied,
-  //   // the onNotificationPressed function is not called and the app opens.
-  //   //
-  //   // If you do not use the onNotificationPressed or launchApp function,
-  //   // you do not need to write this code.
-  //   if (!await FlutterForegroundTask.canDrawOverlays) {
-  //     final isGranted =
-  //     await FlutterForegroundTask.openSystemAlertWindowSettings();
-  //     if (!isGranted) {
-  //       print('SYSTEM_ALERT_WINDOW permission denied!');
-  //       return false;
-  //     }
-  //   }
-  //
-  //   // You can save data using the saveData function.
-  //   await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
-  //
-  //   ReceivePort? receivePort;
-  //   if (await FlutterForegroundTask.isRunningService) {
-  //     return FlutterForegroundTask.restartService();
-  //   } else {
-  //     return FlutterForegroundTask.startService(
-  //       notificationTitle: 'Foreground Service is running',
-  //       notificationText: 'Tap to return to the app',
-  //       callback: startCallback,
-  //
-  //
-  //
-  //     );
-  //   }
-  //
-  //   return _registerReceivePort(receivePort);
-  // }
-
-
-
-
-
   Future<bool> _startForegroundTask() async {
     print("start fg service");
 
@@ -622,9 +491,6 @@ box.erase(),
       );
     }
   }
-
-
-
 
   Future<bool> _stopForegroundTask() async {
     return await FlutterForegroundTask.stopService();
@@ -660,51 +526,46 @@ box.erase(),
 
   T? _ambiguate<T>(T? value) => value;
 
-
-
-
-
-
-
-
-
-
-
-
   void _navigateAndRefresh(BuildContext context, Mission mission) async {
     final result = await Get.to(const NewMission(), arguments: mission);
     if (result != null) {
       //mission.getEMR(''); // call your own function here to refresh screen
-      controller.getData(GetStorage().read("token"));
-      // Get.reloadAll(force: true ,key:key);
-      //Get.reset();
+      controller!.getData(token);
     }
   }
 
-
-
-
-
-
-
-
-
-
-  Future getPosition() async{
+  Future getPosition() async {
     LocationPermission permission;
     _gpsService();
-    permission=await Geolocator.checkPermission();
-    if(permission==LocationPermission.denied){
-      permission=await Geolocator.requestPermission();
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
     }
-
   }
-  Future<Position> getLatAndLong() async{
-    // _position=await Geolocator.getCurrentPosition().then((value) => value);
-     _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-    return _position;
+  // Future<Position> getLatAndLong() async {
+  //   // _position=await Geolocator.getCurrentPosition().then((value) => value);
+  //   _position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high);
+  //
+  //   return _position;
+  // }
+  //
+
+  Future<Position?> getLatAndLong() async {
+    if (!(await Geolocator.isLocationServiceEnabled())) {
+      return null;  // Return null if location service is not enabled
+    }
+    try {
+      _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      return _position;
+    } catch (e) {
+      // Handle exception (e.g., location permissions are denied)
+      return null;
+    }
   }
+
+
   Future _gpsService() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
       _checkGps();
@@ -712,218 +573,168 @@ box.erase(),
     }
     return true;
   }
+
   /*Show dialog if GPS not enabled and open settings location*/
   Future _checkGps() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
       if (Theme.of(context).platform == TargetPlatform.android) {
-
-        AwesomeDialog(context: context ,title: "services",body:Column(
-          children: [
-            const Text('Please make sure you enable GPS and try again'),
-            TextButton(child: Text('Ok'),
-                onPressed: () {
-                  final AndroidIntent intent = AndroidIntent(
-                      action: 'android.settings.LOCATION_SOURCE_SETTINGS');
-                  intent.launch();
-                  Navigator.of(context, rootNavigator: true).pop();
-                  _gpsService();
-                })
-          ],
-
-        ) )..show();
-
+        AwesomeDialog(
+            context: context,
+            title: "services",
+            body: Column(
+              children: [
+                const Text('Please make sure you enable GPS and try again'),
+                TextButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      final AndroidIntent intent = AndroidIntent(
+                          action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+                      intent.launch();
+                      Navigator.of(context, rootNavigator: true).pop();
+                      _gpsService();
+                    })
+              ],
+            ))
+          ..show();
       }
     }
   }
-  Widget _bottomBar(){
+
+  Widget _bottomBar() {
     return Material(
-        color:Colors.green,
+        color: Colors.green,
         child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-
-              const Text("اضغط هنا لجعل حالة التطبيق غير منوفر",style: TextStyle(color: Colors.white),)
-              ,
-              IconButton( icon: const Icon(Icons.stop,color: Colors.white,), onPressed: () async {
-                setState(()  {
-
-                  GetStorage().write("status", "off");
-                });
-                  _stopForegroundTask();
-                await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
-
-                 TemaServiceApi().updateGeoStatus("notAvailable", GetStorage().read("token"));
-              },
-
+              const Text(
+                "اضغط هنا لجعل حالة التطبيق غير منوفر",
+                style: TextStyle(color: Colors.white),
               ),
-            ]
-        )
-    );
+              IconButton(
+                icon: const Icon(
+                  Icons.stop,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  setState(() {
+                    GetStorage().write("status", "off");
+                  });
+                  _stopForegroundTask();
+                  await TemaServiceApi().updateGeoLocation(
+                      _position.latitude.toString(),
+                      _position.longitude.toString(),
+                      token);
+
+                  TemaServiceApi().updateGeoStatus("notAvailable", token);
+                },
+              ),
+            ]));
   }
-  Widget _bottomBarRed(){
+
+  Widget _bottomBarRed() {
     return Material(
-      color:Colors.red,
+      color: Colors.red,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-
-          const Text("اضغط هنا لجعل حالة التطبيق  منوفر",style: TextStyle(color: Colors.white),)
-
-          ,IconButton( icon: const Icon(Icons.play_arrow ,color: Colors.white,), onPressed: () async {
-
-            GetStorage().write("status", "on");
-            setState(()  {
-
-
-
-            });
-             TemaServiceApi().updateGeoStatus("available", GetStorage().read("token").toString());
-            _position=   await getLatAndLong();
-            await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
-
-            _startForegroundTask() ;
-
-
-          },
-
+          const Text(
+            "اضغط هنا لجعل حالة التطبيق  منوفر",
+            style: TextStyle(color: Colors.white),
           ),
+          IconButton(
+            icon: const Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              GetStorage().write("status", "on");
+              setState(() {});
+              TemaServiceApi().updateGeoStatus("available", token);
+              _position = (await getLatAndLong())!;
+              await TemaServiceApi().updateGeoLocation(
+                  _position.latitude.toString(),
+                  _position.longitude.toString(),
+                  token);
 
-
-
+              _startForegroundTask();
+            },
+          ),
         ],
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 }
-
-
-
-
 
 class MyTaskHandler extends TaskHandler {
   SendPort? _sendPort;
+  final _storage = FlutterSecureStorage();
 
 //  int _eventCount = 0;
   late Position _position;
-  Future<Position> getLatAndLong() async{
-    print('getLatAndLong  ---- ');
-    _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-    return _position;
-  }
-  // @override
-  // Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
-  //   _sendPort = sendPort;
-  //
-  //   // You can use the getData function to get the stored data.
-  //   final customData =
-  //   await FlutterForegroundTask.getData<String>(key: 'customData');
-  //   print('customData: $customData');
-  // }
+
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
-
-    // You can use the getData function to get the stored data.
     final customData =
-    await FlutterForegroundTask.getData<String>(key: 'customData');
+        await FlutterForegroundTask.getData<String>(key: 'customData');
     print('customData: $customData');
   }
-
-  // @override
-  // Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
-  //   FlutterForegroundTask.updateService(
-  //     notificationTitle: 'Tema Service Running...',
-  //     //notificationText: 'eventCount: $_eventCount'
-  //   );
-  //
-  //   // Send data to the main isolate.
-  //   // sendPort?.send(_eventCount);
-  //
-  //   // _eventCount++
-  //   // ;
-  //   print('before getLong ');
-  //   getLatAndLong();
-  //
-  //   print("My token "+GetStorage().read("token"));
-  //
-  //   TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), GetStorage().read("token"));
-  //
-  //   print("My lattitude "+_position.latitude.toString());
-  //   print("My longitude "+_position.longitude.toString());
-  // }
-
-
+  Future<Position?> getLatAndLong() async {
+    if (!(await Geolocator.isLocationServiceEnabled())) {
+      return null;  // Return null if location service is not enabled
+    }
+    try {
+      _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      return _position;
+    } catch (e) {
+      // Handle exception (e.g., location permissions are denied)
+      return null;
+    }
+  }
 
   @override
   Future<void> onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
     FlutterForegroundTask.updateService(
-
-
-
-      notificationTitle: 'Tema Service Running...',
-      notificationText: 'Enter ......'
-
-    );
-
-    // // Send data to the main isolate.
-    // sendPort?.send(_eventCount);
-    //
-    // _eventCount++;
-
+        notificationTitle: 'Tema Service Running...',
+        notificationText: 'Enter ......');
 
     print('before getLong ');
     getLatAndLong();
 
-    final token = GetStorage().read("token");
+    final token = await _storage.read(key: "token");
     print("My token: ${token ?? 'Token not available'}");
 
-    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
-log(_position.latitude.toString());
+    await TemaServiceApi().updateGeoLocation(
+        _position.latitude.toString(), _position.longitude.toString(), token!);
+    log(_position.latitude.toString());
 
-
-    print("My lattitude "+_position.latitude.toString());
-    print("My longitude "+_position.longitude.toString());
-
+    print("My lattitude " + _position.latitude.toString());
+    print("My longitude " + _position.longitude.toString());
   }
-
-
-
 
   @override
   Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
     print('onDestroy');
   }
 
-  // Called when the notification button on the Android platform is pressed.
   @override
   void onNotificationButtonPressed(String id) {
     print('onNotificationButtonPressed >> $id');
   }
 
-  // Called when the notification itself on the Android platform is pressed.
-  //
-  // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
-  // this function to be called.
   @override
   void onNotificationPressed() {
-    // Note that the app will only route to "/resume-route" when it is exited so
-    // it will usually be necessary to send a message through the send port to
-    // signal it to restore state when the app is already started.
     FlutterForegroundTask.launchApp("/");
     _sendPort?.send('onNotificationPressed');
   }
-
-
 }
-
-
-
-
-
-
-
-

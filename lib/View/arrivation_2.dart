@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:e_survey/View/tema_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -23,7 +24,7 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
   late Mission m;
   late Position _position;
 
-  final box = GetStorage();
+  final box = FlutterSecureStorage();
   bool progress = false;
 
   @override
@@ -32,8 +33,11 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
+    double buttonWidth = MediaQuery.of(context).size.width * 0.4; // Example width, adjust as needed
+    double buttonHeight = 50;
     return Scaffold(
       backgroundColor: Colors.grey,
       appBar: AppBar(
@@ -62,25 +66,29 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
                   ),
                   SizedBox(height: 60),
                   Row(
-                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-
-
                       Expanded(
-                        flex: 1,
-                        child: Container(
+                        child: SizedBox(
+                          width: buttonWidth,
+                          height: buttonHeight,
                           child: ElevatedButton(
+
                             child: Text(
-                              "غير موجود أو لا أستطيع الوصول ",
+                              "غير موجود أو لا أستطيع الوصول",
+                              textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Colors.white, fontSize: 17),
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             onPressed: () async {
                               // Perform 'Not Arrive' action here
                               _position=   await getLatAndLong();
+                              final token = await box.read(key: "token");
                               // Perform 'Arrive' action here
                               bool success = await TemaServiceApi()
-                                  .updateArrivedStatus(false, m.accidentId, box.read('token'),_position.longitude.toString(),_position.latitude.toString());
+                                  .updateArrivedStatus(false, m.accidentId, token.toString(),_position.longitude.toString(),_position.latitude.toString());
                               if (success) {
 
                                 Platform.isIOS?
@@ -91,32 +99,22 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
                                 primary: Colors.blue,
                                 textStyle: TextStyle(
                                     fontSize: 30,
-                                    fontWeight: FontWeight.bold)),
+                                    fontWeight: FontWeight.bold)
+                            ,  alignment: Alignment.center,
+
+                            ),
+
                           ),
                         ),
                       ),
 
 
 
-
-
-
-
-
-
-
-
-                      SizedBox(
-                        width: 20,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-
-
+                      SizedBox(width: 20),
                       Expanded(
-                        flex: 1,
-                        child: Container(
+                        child: SizedBox(
+                          width: buttonWidth,
+                          height: buttonHeight,
                           child: ElevatedButton(
                             child: Text(
                               "وصلت",
@@ -126,8 +124,11 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
                             onPressed: () async {
                               _position=   await getLatAndLong();
                               // Perform 'Arrive' action here
+                              final token = await box.read(key: "token");
+
                               bool success = await TemaServiceApi()
-                                  .updateArrivedStatus(true, m.accidentId, box.read('token'),_position.longitude.toString(),_position.latitude.toString());
+
+                                  .updateArrivedStatus(true, m.accidentId, token.toString(),_position.longitude.toString(),_position.latitude.toString());
                               if (success) {
                                 showDialog(
                                   context: context,
@@ -169,13 +170,13 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
 
                     ],
                   ),
-                  const SizedBox(height: 60),
+                  SizedBox(height: 80),
                   Row(
-                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       Expanded(
-                        flex: 1,
-                        child: Container(
+                        child: SizedBox(
+                          width: buttonWidth,
+                          height: buttonHeight,
                           child: ElevatedButton(
                             child: Text(
                               "رقم السائق",
@@ -193,15 +194,11 @@ class _ArrivationVerification2State extends State<ArrivationVerification2> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
+                      SizedBox(width: 20),
                       Expanded(
-                        flex: 1,
-                        child: Container(
+                        child: SizedBox(
+                          width: buttonWidth,
+                          height: buttonHeight,
                           child: ElevatedButton(
                             child: Text(
                               "مركز الاتصال",

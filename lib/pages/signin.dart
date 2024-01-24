@@ -8,12 +8,15 @@ import 'package:flutter/material.dart';
 //import 'package:flutter_svg/svg.dart';
 import 'package:e_survey/pages/dashboard.dart';
 import 'package:e_survey/Models//user.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import '../Models/LoginResponse.dart';
+import '../service/TemaServiceApi.dart';
 import 'bridge_page.dart';
 import 'home.dart';
 import 'dart:io' as io;
@@ -31,6 +34,7 @@ class _SigninState extends State<Signin> {
   static const String userIDPrefKey = 'userId_pref';
 String savedUid ="";
   final _formKey = GlobalKey<FormState>();
+  final storage = new FlutterSecureStorage();
 
 
   @override
@@ -40,115 +44,65 @@ String savedUid ="";
       setState(() =>
       this._prefs=prefs);
 
-// _loadUserId();
-//       if(savedUid.isNotEmpty){
-//         Navigator.pushNamed(context, "/home");
-//       }
-    });
-
-    if(box.read('isTemaUser')=="true" && box.read('isESurveyUser')=="true") {
-      log("loged in ");
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => Bridge()));
-      });
     }
-    else
-    if(box.read('isESurveyUser')=="true"){
+    );
 
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => Home()));
-      });
-    }
-    else
-    if(box.read('isTemaUser')=="true"){
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        io.Platform.isIOS?
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => ExpertMissions2())):
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => ExpertMissions()));
-      });
-    }
+    _checkLoginStatus();
 
     super.initState();
 
   }
 
 
-  Future save() async {
-    var res = await http.post(Uri.parse(AppUrl.login),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        }
-    ,
-
-        body: jsonEncode(<String, String>{
-          'userId': user.userId,
-          'password': user.password
-        }),);
-        // body: <String, String>{
-        //   'userId': user.userId,
-        //   'password': user.password
-        // });
-    print(res.body);
-   Map <String,dynamic>map =  jsonDecode(res.body);
-
-     //data = json.decode(res.body);
-    String uid=map['userId'];
-    String tok =map['token'];
-    bool isTemaUser  =map['temaUser'];
-    bool isESurveyUser  = map['esurveyUser'];
-
-    print(tok);
-    _setStringPref(uid,tok);
-    box.write('userId', uid);
-    box.write('token', tok);
-    box.write('isTemaUser',isTemaUser.toString());
-    box.write('isESurveyUser',isESurveyUser.toString());
-
-    if(isTemaUser && isESurveyUser){
-      log("bridgeee");
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => Bridge()));
-      });
-
-
+  Future<void> _checkLoginStatus() async {
+    final token = await storage.read(key: "token");
+    if (token != null && token.isNotEmpty) {
+      _navigateToHome();
     }
-else
-    if(isESurveyUser){
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => Home()));
-      });
-    }
-    else
-    if(isTemaUser){
-if(Platform.isIOS){
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => ExpertMissions2()));
-  });
-}else {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => ExpertMissions()));
-  });
-}
-
-
-    }
-
-
-
-
-
   }
 
+  void _navigateToHome() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      io.Platform.isIOS
+          ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ExpertMissions2()))
+          : Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ExpertMissions()));
+    });
+  }
+
+
+
+  Future login() async {
+    try {
+      LoginResponse response = await TemaServiceApi().login(user.userId, user.password,context);
+      // Handle the login response
+      if (response.token.isNotEmpty) {
+        print('Logged in successfully, token: ${response.token}');
+        _setStringPref("userId", response.token);
+        // box.write("token",response.token );
+        box.write("userId",user.userId );
+        await storage.write(key: "token", value: response.token);
+        await storage.write(key: "refresh_token", value: response.refreshToken);
+        if(Platform.isIOS){
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => ExpertMissions2()));
+          });
+        }else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (_) => ExpertMissions()));
+          });
+        }
+
+      } else {
+        print('Login failed');
+      }
+    } catch (e) {
+      // Handle any errors that might occur
+      print('Error during login: $e');
+    }
+  }
   User user = User('', '');
   @override
   Widget build(BuildContext context) {
@@ -157,14 +111,6 @@ if(Platform.isIOS){
         body: SingleChildScrollView(
           child: Stack(
       children: [
-
-          // Positioned(
-          //     top: 0,
-          //     child: SvgPicture.asset(
-          //       'assets/top.svg',
-          //       width: 400,
-          //       height: 150,
-          //     )),
           Container(
             alignment: Alignment.center,
             child: Form(
@@ -178,11 +124,6 @@ if(Platform.isIOS){
                   ),
                   Text(
                     "Claims",
-                    // style: GoogleFonts.pacifico(
-                    //     fontWeight: FontWeight.bold,
-                    //     fontSize: 50,
-                    //     color: Colors.blue),
-
                     style: TextStyle(fontWeight: FontWeight.bold,fontSize: 50,color: Colors.blue),
 
                   ),
@@ -202,14 +143,6 @@ if(Platform.isIOS){
                         }
                         return null;
                       },
-                        //else if (RegExp(
-                      //           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                      //       .hasMatch(value)) {
-                      //     return null;
-                      //   } else {
-                      //     return 'Enter valid email';
-                      //   }
-                      // },
                       decoration: InputDecoration(
                           icon: Icon(
                             Icons.email,
@@ -282,7 +215,7 @@ if(Platform.isIOS){
                           //     borderRadius: BorderRadius.circular(16.0)),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              save();
+                              login();
                             } else {
                               print("not ok");
                             }
@@ -293,31 +226,7 @@ if(Platform.isIOS){
                           )),
                     ),
                   ),
-                  // Padding(
-                  //     padding: const EdgeInsets.fromLTRB(95, 20, 0, 0),
-                  //     child: Row(
-                  //       children: [
-                  //         // Text(
-                  //         //   "Not have Account ? ",
-                  //         //   style: TextStyle(
-                  //         //       color: Colors.black, fontWeight: FontWeight.bold),
-                  //         // ),
-                  //         // InkWell(
-                  //         //   // onTap: () {
-                  //         //   //   Navigator.push(
-                  //         //   //       context,
-                  //         //   //       new MaterialPageRoute(
-                  //         //   //           builder: (context) => Signup()));
-                  //         //   // },
-                  //         //   // child: Text(
-                  //         //   //   "Esurvey",
-                  //         //   //   style: TextStyle(
-                  //         //   //       color: Colors.blue,
-                  //         //   //       fontWeight: FontWeight.bold),
-                  //         //   // ),
-                  //         // ),
-                  //       ],
-                  //     ))
+
                 ],
               ),
             ),

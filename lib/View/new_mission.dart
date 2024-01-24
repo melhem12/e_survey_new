@@ -4,6 +4,7 @@ import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/View/arrivation.dart';
 import 'package:e_survey/service/TemaServiceApi.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:get_storage/get_storage.dart';
@@ -19,7 +20,7 @@ class NewMission extends StatefulWidget {
 }
 
 class _NewMissionState extends State<NewMission> {
-  final box = GetStorage();
+  final box = FlutterSecureStorage();
 
   late  Mission m  ;
   @override
@@ -117,7 +118,9 @@ SizedBox(
                         ),
                           onPressed: () async {
 TemaServiceApi tema = new TemaServiceApi();
-await tema.updateAccidentStatus("rejected", m.accidentId, box.read("token").toString());
+String? token = await box.read(key: 'token');
+
+await tema.updateAccidentStatus(context,"rejected", m.accidentId, token.toString());
 Get.back(result: 'hello');
                           },
                           style: ElevatedButton.styleFrom(
@@ -144,8 +147,9 @@ Get.back(result: 'hello');
                         ),
                         onPressed: () async {
                           TemaServiceApi tema = new TemaServiceApi();
+                          String? token = await box.read(key: 'token');
 
-                          tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
+                          tema.updateAccidentStatus(context,"accepted", m.accidentId, token.toString());
 Get.to(ArrivationVerification2(),arguments: m);
                         },
                         style: ElevatedButton.styleFrom(

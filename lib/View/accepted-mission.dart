@@ -1,5 +1,6 @@
 import 'package:e_survey/View/arrivation_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -13,7 +14,7 @@ class AcceptedMission extends StatefulWidget {
 }
 
 class _AcceptedMissionState extends State<AcceptedMission> {
-  final box = GetStorage();
+  final box = FlutterSecureStorage();
 
   late  Mission m  ;
   @override

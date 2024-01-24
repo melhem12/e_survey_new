@@ -17,11 +17,11 @@ class AppDamagesParts {
   List<AppDamagePartResponse> appDamagePartResponses;
 
   factory AppDamagesParts.fromJson(Map<String, dynamic> json) => AppDamagesParts(
-    appDamagePartResponses: List<AppDamagePartResponse>.from(json["appDamagePartResponses"].map((x) => AppDamagePartResponse.fromJson(x))),
+    appDamagePartResponses: List<AppDamagePartResponse>.from(json["data"].map((x) => AppDamagePartResponse.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
-    "appDamagePartResponses": appDamagePartResponses == null ? null : List<dynamic>.from(appDamagePartResponses.map((x) => x.toJson())),
+    "data": appDamagePartResponses == null ? null : List<dynamic>.from(appDamagePartResponses.map((x) => x.toJson())),
   };
 }
 

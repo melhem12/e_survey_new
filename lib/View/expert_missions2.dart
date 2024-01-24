@@ -31,8 +31,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 //   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 // }
 
-
-
 class ExpertMissions2 extends StatefulWidget {
   const ExpertMissions2({Key? key}) : super(key: key);
 
@@ -43,25 +41,22 @@ class ExpertMissions2 extends StatefulWidget {
 class _ExpertMissions2State extends State<ExpertMissions2> {
   late Position _position;
   final box = GetStorage();
-  String token="";
+  String token = "";
   String? filter;
   ReceivePort? _receivePort;
   final MissionsViewModel controller =
-  Get.put(MissionsViewModel(initialToken: GetStorage().read("token")));
+      Get.put(MissionsViewModel(initialToken: GetStorage().read("token")));
 
 //  ExpertMissions({Key? key}) : super(key: key);
 
-
   @override
   void initState() {
-
-    FirebaseMessaging.instance
-        .subscribeToTopic(box.read("userId").toString());
-     //initializeService() ;
+    FirebaseMessaging.instance.subscribeToTopic(box.read("userId").toString());
+    //initializeService() ;
 
     super.initState();
 
-    token=box.read("token");
+    token = box.read("token");
     // _initForegroundTask();
     // _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
     //   // You can get the previous ReceivePort without restarting the service.
@@ -72,8 +67,8 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-     // await _requestPermissionForAndroid();
-     // _initForegroundTask();
+      // await _requestPermissionForAndroid();
+      // _initForegroundTask();
 
       // You can get the previous ReceivePort without restarting the service.
       // if (await FlutterForegroundTask.isRunningService) {
@@ -89,28 +84,30 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
       //   timer.cancel();
       // }
       controller.getData(GetStorage().read('token'));
-     // _position=   await getLatAndLong();
-     // await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+      // _position=   await getLatAndLong();
+      // await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
     });
   }
+
   Timer scheduleTimeout([int milliseconds = 10000]) =>
       Timer(Duration(milliseconds: milliseconds), handleTimeout);
+
   void handleTimeout() {
     log("kkkkkkkkkkkkkkkkkkkkk");
   }
 
-
   @override
-  Widget build (BuildContext context) {
-
-
-
+  Widget build(BuildContext context) {
     var drawerHeader = UserAccountsDrawerHeader(
       accountName: Text(GetStorage().read("userId")),
       accountEmail: Text(box.read("userId")),
       currentAccountPicture: CircleAvatar(
         backgroundColor: Colors.white,
-        child: Icon(Icons.person ,size: 65,color: Colors.blue,),
+        child: Icon(
+          Icons.person,
+          size: 65,
+          color: Colors.blue,
+        ),
       ),
       // otherAccountsPictures: <Widget>[
       //   CircleAvatar(
@@ -140,35 +137,35 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
         //
         // ),
         ListTile(
-            title:  Row(
+            title: Row(
               children: <Widget>[
-                SizedBox(width: 5,),
+                SizedBox(
+                  width: 5,
+                ),
                 Icon(Icons.exit_to_app),
-                SizedBox(width: 5,),
+                SizedBox(
+                  width: 5,
+                ),
                 Text('Logout'),
-
               ],
             ),
-
             onTap: () async => {
-              Navigator.of(context).pushNamed('/'),
-              box.erase(),
-            }
-        ),
-
+                  Navigator.of(context).pushNamed('/'),
+                  box.erase(),
+                }),
       ],
     );
 
-     return
-       // WithForegroundTask(
-      //  child :
-    Scaffold(
+    return
+        // WithForegroundTask(
+        //  child :
+        Scaffold(
       drawer: Drawer(
         child: drawerItems,
       ),
-      bottomNavigationBar: GetStorage().read('status')=="on"?_bottomBar():_bottomBarRed(),
+      bottomNavigationBar:
+          GetStorage().read('status') == "on" ? _bottomBar() : _bottomBarRed(),
       appBar: AppBar(
-
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -184,14 +181,14 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
         actions: <Widget>[
           PopupMenuButton<int>(
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 1,
-                child: Text("First"),
-              ),
-              const PopupMenuItem(
-                value: 2,
-                child: Text("Second"),
-              ),
+              // const PopupMenuItem(
+              //   value: 1,
+              //   child: Text("First"),
+              // ),
+              // const PopupMenuItem(
+              //   value: 2,
+              //   child: Text("Second"),
+              // ),
             ],
           )
         ],
@@ -205,13 +202,11 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
             Expanded(
               flex: 2,
               child: TextField(
-                onChanged : (String value)  {
+                onChanged: (String value) {
                   filter = value;
-                  if(value.trim().isNotEmpty){
+                  if (value.trim().isNotEmpty) {
                     controller.searchMission(value);
-
-                  }
-                  else{
+                  } else {
                     controller.getData(GetStorage("token").toString());
                   }
                 },
@@ -319,30 +314,27 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                     padding: const EdgeInsets.all(10.0),
                     itemCount: controller.missions.length,
                     itemBuilder: (
-                        context,
-                        index,
-                        ) {
+                      context,
+                      index,
+                    ) {
                       final Mission mission = controller.missions[index];
-                      print('mission ${mission.accidentId}: ${mission.accidentStatus}');
+                      print(
+                          'mission ${mission.accidentId}: ${mission.accidentStatus}');
                       return InkWell(
                         key: ValueKey(mission.accidentId),
 
                         onTap: () => {
                           if (mission.accidentStatus.toString() == "new")
                             {_navigateAndRefresh(context, mission)}
-                          else if(mission.accidentStatus.toString() == "accepted"){
-                            if(mission.accdentArrivedStatus==true){
-                              Get.to(TemaMenu(),arguments: mission)
-
-                            }else{
-                              Get.to(AcceptedMission(),arguments: mission)
-
+                          else if (mission.accidentStatus.toString() ==
+                              "accepted")
+                            {
+                              if (mission.accdentArrivedStatus == true)
+                                {Get.to(TemaMenu(), arguments: mission)}
+                              else
+                                {Get.to(AcceptedMission(), arguments: mission)}
                             }
-                          }
-                        }
-
-
-                        ,
+                        },
                         //
                         child: Card(
                           elevation: 5,
@@ -355,23 +347,22 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                    mission.accidentCustomerName.toString(),
+                                Text(mission.accidentCustomerName.toString(),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color:
-                                        mission.accidentStatus.toString() ==
-                                            "new"
-                                            ? Colors.green
-                                            : mission.accidentStatus
-                                            .toString() ==
-                                            "rejected"
-                                            ? Colors.red
-                                            : mission.accidentStatus
-                                            .toString() ==
-                                            "accepted"
-                                            ? Colors.blue
-                                            : Colors.grey)),
+                                            mission.accidentStatus.toString() ==
+                                                    "new"
+                                                ? Colors.green
+                                                : mission.accidentStatus
+                                                            .toString() ==
+                                                        "rejected"
+                                                    ? Colors.red
+                                                    : mission.accidentStatus
+                                                                .toString() ==
+                                                            "accepted"
+                                                        ? Colors.blue
+                                                        : Colors.grey)),
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -382,17 +373,17 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: mission.accidentStatus
-                                          .toString() ==
-                                          "new"
+                                                  .toString() ==
+                                              "new"
                                           ? Colors.green
                                           : mission.accidentStatus.toString() ==
-                                          "rejected"
-                                          ? Colors.red
-                                          : mission.accidentStatus
-                                          .toString() ==
-                                          "accepted"
-                                          ? Colors.blue
-                                          : Colors.grey),
+                                                  "rejected"
+                                              ? Colors.red
+                                              : mission.accidentStatus
+                                                          .toString() ==
+                                                      "accepted"
+                                                  ? Colors.blue
+                                                  : Colors.grey),
                                 ),
                               ],
                             ),
@@ -404,14 +395,13 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
             ),
 
             // _buildContentView(),
-
           ],
         ),
-
       ),
-    // )
+      // )
     );
   }
+
   // Widget _buildContentView() {
   //   buttonBuilder(String text, {VoidCallback? onPressed}) {
   //     return ElevatedButton(
@@ -450,12 +440,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 // //Navigator.push(context, NewMission());
 // }
 
-
-
-
-
-
-
   // Future<void> _initForegroundTask() async {
   //   FlutterForegroundTask.init(
   //       androidNotificationOptions: AndroidNotificationOptions(
@@ -487,7 +471,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //       )
   //   );
   // }
-
 
   // Future<void> _requestPermissionForAndroid() async {
   //   if (!Platform.isAndroid) {
@@ -522,7 +505,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //     await FlutterForegroundTask.requestNotificationPermission();
   //   }
   // }
-
 
   // void _initForegroundTask() {
   //   FlutterForegroundTask.init(
@@ -567,9 +549,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //   );
   // }
 
-
-
-
   // Future<bool> _startForegroundTask() async {
   //   print("start fg service");
   //   // "android.permission.SYSTEM_ALERT_WINDOW" permission must be granted for
@@ -609,10 +588,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //   return _registerReceivePort(receivePort);
   // }
 
-
-
-
-
   // Future<bool> _startForegroundTask() async {
   //   print("start fg service");
   //
@@ -637,9 +612,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //     );
   //   }
   // }
-
-
-
 
   // Future<bool> _stopForegroundTask() async {
   //   return await FlutterForegroundTask.stopService();
@@ -675,17 +647,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 
   T? _ambiguate<T>(T? value) => value;
 
-
-
-
-
-
-
-
-
-
-
-
   void _navigateAndRefresh(BuildContext context, Mission mission) async {
     final result = await Get.to(const NewMission(), arguments: mission);
     if (result != null) {
@@ -696,30 +657,23 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     }
   }
 
-
-
-
-
-
-
-
-
-
-  Future getPosition() async{
+  Future getPosition() async {
     LocationPermission permission;
     _gpsService();
-    permission=await Geolocator.checkPermission();
-    if(permission==LocationPermission.denied){
-      permission=await Geolocator.requestPermission();
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
     }
-
   }
-  Future<Position> getLatAndLong() async{
+
+  Future<Position> getLatAndLong() async {
     // _position=await Geolocator.getCurrentPosition().then((value) => value);
-    _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    _position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
 
     return _position;
   }
+
   Future _gpsService() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
       _checkGps();
@@ -727,7 +681,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     }
     return true;
   }
-
 
   // Future<void> initializeService() async {
   //   final service = FlutterBackgroundService();
@@ -788,11 +741,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //   service.startService();
   // }
 
-
-
-
-
-
   // @pragma('vm:entry-point')
   // Future<bool> onIosBackground(ServiceInstance service) async {
   //   WidgetsFlutterBinding.ensureInitialized();
@@ -807,162 +755,127 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   //   return true;
   // }
 
-
-
-
-
-
-
-
-
-
-
-
   /*Show dialog if GPS not enabled and open settings location*/
   Future _checkGps() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
       if (Theme.of(context).platform == TargetPlatform.android) {
-
-        AwesomeDialog(context: context ,title: "services",body:Column(
-          children: [
-            const Text('Please make sure you enable GPS and try again'),
-            TextButton(child: Text('Ok'),
-                onPressed: () {
-                  final AndroidIntent intent = AndroidIntent(
-                      action: 'android.settings.LOCATION_SOURCE_SETTINGS');
-                  intent.launch();
-                  Navigator.of(context, rootNavigator: true).pop();
-                  _gpsService();
-                })
-          ],
-
-        ) )..show();
-
+        AwesomeDialog(
+            context: context,
+            title: "services",
+            body: Column(
+              children: [
+                const Text('Please make sure you enable GPS and try again'),
+                TextButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      final AndroidIntent intent = AndroidIntent(
+                          action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+                      intent.launch();
+                      Navigator.of(context, rootNavigator: true).pop();
+                      _gpsService();
+                    })
+              ],
+            ))
+          ..show();
       }
     }
   }
-  Widget _bottomBar(){
+
+  Widget _bottomBar() {
     return Material(
-        color:Colors.green,
+        color: Colors.green,
         child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-
-              const Text("اضغط هنا لجعل حالة التطبيق غير منوفر",style: TextStyle(color: Colors.white),)
-              ,
-              IconButton( icon: const Icon(Icons.stop,color: Colors.white,), onPressed: () async {
-
-
-                // final service = FlutterBackgroundService();
-                // var isRunning = await service.isRunning();
-                // if (isRunning) {
-                //   service.invoke('stopService');
-                // }
-
-                sendToNative(0);
-
-                setState(()  {
-
-                  GetStorage().write("status", "off");
-                });
-
-
-
-                //_stopForegroundTask();
-            //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
-
-                TemaServiceApi().updateGeoStatus("notAvailable", GetStorage().read("token"));
-              },
-
+              const Text(
+                "اضغط هنا لجعل حالة التطبيق غير منوفر",
+                style: TextStyle(color: Colors.white),
               ),
-            ]
-        )
-    );
+              IconButton(
+                icon: const Icon(
+                  Icons.stop,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  // final service = FlutterBackgroundService();
+                  // var isRunning = await service.isRunning();
+                  // if (isRunning) {
+                  //   service.invoke('stopService');
+                  // }
+
+                  sendToNative(0);
+
+                  setState(() {
+                    GetStorage().write("status", "off");
+                  });
+
+                  //_stopForegroundTask();
+                  //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+
+                  TemaServiceApi().updateGeoStatus(
+                      "notAvailable", GetStorage().read("token"));
+                },
+              ),
+            ]));
   }
-  Widget _bottomBarRed(){
+
+  Widget _bottomBarRed() {
     return Material(
-      color:Colors.red,
+      color: Colors.red,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-
-          const Text("اضغط هنا لجعل حالة التطبيق  منوفر",style: TextStyle(color: Colors.white),)
-
-          ,IconButton( icon: const Icon(Icons.play_arrow ,color: Colors.white,), onPressed: () async {
-
-            GetStorage().write("status", "on");
-
-
-
-            sendToNative(2);
-
-            // final service = FlutterBackgroundService();
-            // var isRunning = await service.isRunning();
-            // service.invoke("setAsBackground");
-            // if (!isRunning) {
-            //   service.startService();
-            // }
-
-
-
-
-            setState(()  {
-
-
-
-            });
-            TemaServiceApi().updateGeoStatus("available", GetStorage().read("token").toString());
-            _position=   await getLatAndLong();
-        //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
-
-            //_startForegroundTask() ;
-
-
-
-
-
-
-
-
-
-
-          },
-
+          const Text(
+            "اضغط هنا لجعل حالة التطبيق  منوفر",
+            style: TextStyle(color: Colors.white),
           ),
+          IconButton(
+            icon: const Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              GetStorage().write("status", "on");
 
+              sendToNative(2);
 
+              // final service = FlutterBackgroundService();
+              // var isRunning = await service.isRunning();
+              // service.invoke("setAsBackground");
+              // if (!isRunning) {
+              //   service.startService();
+              // }
 
+              setState(() {});
+              TemaServiceApi().updateGeoStatus(
+                  "available", GetStorage().read("token").toString());
+              _position = await getLatAndLong();
+              //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+
+              //_startForegroundTask() ;
+            },
+          ),
         ],
       ),
     );
   }
 
-
   Future<void> sendToNative(int val) async {
     const MethodChannel _channel =
-    const MethodChannel("FlutterFramework/swift_native");
-
+        const MethodChannel("FlutterFramework/swift_native");
 
     final arguments = {
       'value1': val,
       'value2': 3,
       'token': box.read('token'),
-
     };
 
-
-    final result = await _channel.invokeMethod('getSum',arguments);
+    final result = await _channel.invokeMethod('getSum', arguments);
     print("result from iOS native + Swift ${result}");
   }
-
-
 }
-
-
-
-
 
 // class MyTaskHandler extends TaskHandler {
 //   SendPort? _sendPort;
@@ -1082,13 +995,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 //
 // }
 
-
-
-
-
-
-
-
 // @pragma('vm:entry-point')
 // void onStart(ServiceInstance service) async {
 //   // Only available for flutter 3.0.0 and later
@@ -1175,15 +1081,10 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 //   });
 // }
 
-
-
-
-
-
-
-Future<Position> getLatAndLong() async{
+Future<Position> getLatAndLong() async {
   // _position=await Geolocator.getCurrentPosition().then((value) => value);
- var  _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  var _position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
 
   return _position;
 }
