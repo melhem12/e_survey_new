@@ -8,13 +8,12 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class MissionsViewModel extends GetxController {
-  final String initialToken;
   int currentPage = 0;
   final int pageSize = 10;
   bool isLoading = false;
   bool hasMoreData = true;
 
-  MissionsViewModel({required this.initialToken});
+  MissionsViewModel();
 
   RxList<Mission> missions = <Mission>[].obs;
 
@@ -26,8 +25,8 @@ class MissionsViewModel extends GetxController {
     Timer.periodic(Duration(seconds: 200), (Timer t) => refreshData());
   }
 
-  Future<void> getData(String token, {int page = 0}) async {
-final token1 =await FlutterSecureStorage().read(key: "token");
+  Future<void> getData({int page = 0}) async {
+    final token1 = await FlutterSecureStorage().read(key: "token");
     if (isLoading || !hasMoreData) return;
 
     isLoading = true;
@@ -40,7 +39,8 @@ final token1 =await FlutterSecureStorage().read(key: "token");
 
     if (response.statusCode == 200) {
       try {
-        var newMissions = MissonsModel.fromJson(jsonDecode(response.body)).missions;
+        var newMissions =
+            MissonsModel.fromJson(jsonDecode(response.body)).missions;
         if (newMissions.length < pageSize) {
           hasMoreData = false; // No more data to load
         }
@@ -61,7 +61,7 @@ final token1 =await FlutterSecureStorage().read(key: "token");
   void refreshData() async {
     currentPage = 0; // Reset to the first page
     hasMoreData = true; // Reset hasMoreData flag
-    await getData(initialToken, page: currentPage);
+    await getData( page: currentPage);
   }
 
   void searchMission(String query) {

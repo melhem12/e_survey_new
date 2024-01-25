@@ -54,7 +54,20 @@ class _ExpertMissionsState extends State<ExpertMissions> {
   ReceivePort? _receivePort;
     final storage = FlutterSecureStorage();
   ScrollController _scrollController = ScrollController();
-  MissionsViewModel? controller; // Already nullable
+  // MissionsViewModel? controller; // Already nullable
+
+
+
+
+  MissionsViewModel controller =
+  Get.put(MissionsViewModel());
+
+
+
+
+
+
+
 
   @override
   void initState() {
@@ -86,12 +99,12 @@ class _ExpertMissionsState extends State<ExpertMissions> {
 
   void _setupPeriodicUpdates() {
     Timer.periodic(const Duration(seconds: 200), (Timer timer) async {
-      controller?.getData(token);
-      Position? currentPosition = await getLatAndLong();
-      if (currentPosition != null) {
-        await TemaServiceApi().updateGeoLocation(
-            currentPosition.latitude.toString(), currentPosition.longitude.toString(), token);
-      }
+      controller.refreshData();
+      // Position? currentPosition = await getLatAndLong();
+      // if (currentPosition != null) {
+      //   await TemaServiceApi().updateGeoLocation(
+      //       currentPosition.latitude.toString(), currentPosition.longitude.toString(), token);
+      // }
     });
   }
 
@@ -102,7 +115,6 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     if (storedToken != null) {
       setState(() {
         token = storedToken;
-        controller = Get.put(MissionsViewModel(initialToken: token));
       });
     }
   }
@@ -119,9 +131,9 @@ class _ExpertMissionsState extends State<ExpertMissions> {
         _scrollController.position.maxScrollExtent) {
       if (controller != null) {
         // Null check added
-        controller!.currentPage++;
-        controller!
-            .getData(controller!.initialToken, page: controller!.currentPage);
+        controller.currentPage++;
+        controller
+            .getData( page: controller!.currentPage);
       }
     }
   }
@@ -171,236 +183,249 @@ class _ExpertMissionsState extends State<ExpertMissions> {
 
     return WithForegroundTask(
         child: Scaffold(
-      drawer: Drawer(
-        child: drawerItems,
-      ),
-      bottomNavigationBar:
+          drawer: Drawer(
+            child: drawerItems,
+          ),
+          bottomNavigationBar:
           GetStorage().read('status') == "on" ? _bottomBar() : _bottomBarRed(),
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            const Text("قائمة الطلبات"),
-            InkWell(
-                child: const Icon(Icons.refresh_outlined),
-                onTap: () {
-                  controller?.refreshData();
-                })
-          ],
-        ),
-        centerTitle: false,
-        actions: <Widget>[
-          PopupMenuButton<int>(
-            itemBuilder: (context) => [],
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: TextField(
-                onChanged: (String value) {
-                  filter = value;
-                  if (value.trim().isNotEmpty) {
-                    controller!.searchMission(value);
-                  } else {
-                    controller!.getData(token);
-                  }
-                },
-                style: const TextStyle(
-                  color: Colors.blue,
-                ),
-                decoration: InputDecoration(
-                  labelStyle: const TextStyle(
-                    color: Colors.blue,
-                  ),
-                  labelText: 'Filter',
-                  isDense: true,
-                  fillColor: Colors.grey[300],
-                  filled: true,
-                  hintStyle: const TextStyle(
-                    color: Colors.blue,
-                  ),
-                  border: InputBorder.none,
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(
+          appBar: AppBar(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                const Text("قائمة الطلبات"),
+                InkWell(
+                    child: const Icon(Icons.refresh_outlined),
+                    onTap: () {
+                      controller?.refreshData();
+                    })
+              ],
+            ),
+            centerTitle: false,
+            actions: <Widget>[
+              PopupMenuButton<int>(
+                itemBuilder: (context) => [],
+              )
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    onChanged: (String value) {
+                      filter = value;
+                      if (value
+                          .trim()
+                          .isNotEmpty) {
+                        controller!.searchMission(value);
+                      } else {
+                        controller!.getData();
+                      }
+                    },
+                    style: const TextStyle(
                       color: Colors.blue,
                     ),
+                    decoration: InputDecoration(
+                      labelStyle: const TextStyle(
+                        color: Colors.blue,
+                      ),
+                      labelText: 'Filter',
+                      isDense: true,
+                      fillColor: Colors.grey[300],
+                      filled: true,
+                      hintStyle: const TextStyle(
+                        color: Colors.blue,
+                      ),
+                      border: InputBorder.none,
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                children: const <Widget>[
-                  Expanded(
-                    child: Card(
-                      color: Colors.green,
-                      child: Text(""),
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Card(
-                      color: Colors.blue,
-                      child: Text(""),
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Card(
-                      color: Colors.red,
-                      child: Text(""),
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Card(
-                      color: Colors.grey,
-                      child: Text(""),
-                    ),
-                    flex: 1,
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                children: const <Widget>[
-                  Expanded(
-                    child: Text(
-                      "جديد",
-                      textAlign: TextAlign.center,
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Text(
-                      "قيد المعالجة",
-                      textAlign: TextAlign.center,
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Text(
-                      "لم يلب",
-                      textAlign: TextAlign.center,
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Text(
-                      "مغلق",
-                      textAlign: TextAlign.center,
-                    ),
-                    flex: 1,
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 17,
-                child: Obx(() {
-                  if (controller?.missions.isEmpty ?? true) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                return ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(10.0),
-                    itemCount: controller!.missions.length,
-                    itemBuilder: (
-                      context,
-                      index,
-                    ) {
-                      final Mission mission = controller!.missions[index];
-                      print(
-                          'mission ${mission.accidentId}: ${mission.accidentStatus}');
-                      return InkWell(
-                        key: ValueKey(mission.accidentId),
-
-                        onTap: () => {
-                          if (mission.accidentStatus.toString() == "new")
-                            {_navigateAndRefresh(context, mission)}
-                          else if (mission.accidentStatus.toString() ==
-                              "accepted")
-                            {
-                              if (mission.accdentArrivedStatus == true)
-                                {Get.to(TemaMenu(), arguments: mission)}
-                              else
-                                {Get.to(AcceptedMission(), arguments: mission)}
-                            }
-                        },
-                        //
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    children: const <Widget>[
+                      Expanded(
                         child: Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(mission.accidentCustomerName.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color:
+                          color: Colors.green,
+                          child: Text(""),
+                        ),
+                        flex: 1,
+                      ),
+                      Expanded(
+                        child: Card(
+                          color: Colors.blue,
+                          child: Text(""),
+                        ),
+                        flex: 1,
+                      ),
+                      Expanded(
+                        child: Card(
+                          color: Colors.red,
+                          child: Text(""),
+                        ),
+                        flex: 1,
+                      ),
+                      Expanded(
+                        child: Card(
+                          color: Colors.grey,
+                          child: Text(""),
+                        ),
+                        flex: 1,
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    children: const <Widget>[
+                      Expanded(
+                        child: Text(
+                          "جديد",
+                          textAlign: TextAlign.center,
+                        ),
+                        flex: 1,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "قيد المعالجة",
+                          textAlign: TextAlign.center,
+                        ),
+                        flex: 1,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "لم يلب",
+                          textAlign: TextAlign.center,
+                        ),
+                        flex: 1,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "مغلق",
+                          textAlign: TextAlign.center,
+                        ),
+                        flex: 1,
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 17,
+                  child: Obx(() {
+                    if (controller.missions.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(10.0),
+                        itemCount: controller.missions.length,
+                        itemBuilder: (context,
+                            index,) {
+                          final Mission mission = controller.missions[index];
+                          print(
+                              'mission ${mission.accidentId}: ${mission
+                                  .accidentStatus}');
+                          return InkWell(
+                            key: ValueKey(mission.accidentId),
+
+                            onTap: () =>
+                            {
+                              if (mission.accidentStatus.toString() == "new")
+                                {_navigateAndRefresh(context, mission)}
+                              else
+                                if (mission.accidentStatus.toString() ==
+                                    "accepted")
+                                  {
+                                    if (mission.accdentArrivedStatus == true)
+                                      {Get.to(TemaMenu(), arguments: mission)}
+                                    else
+                                      {
+                                        Get.to(AcceptedMission(),
+                                            arguments: mission)
+                                      }
+                                  }
+                            },
+                            //
+                            child: Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        mission.accidentCustomerName.toString(),
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                            color:
                                             mission.accidentStatus.toString() ==
-                                                    "new"
+                                                "new"
                                                 ? Colors.green
                                                 : mission.accidentStatus
-                                                            .toString() ==
-                                                        "rejected"
-                                                    ? Colors.red
-                                                    : mission.accidentStatus
-                                                                .toString() ==
-                                                            "accepted"
-                                                        ? Colors.blue
-                                                        : Colors.grey)),
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(mission.time.toString()),
-                                    ]),
-                                Text(
-                                  mission.accidentId.toString(),
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      color: mission.accidentStatus
-                                                  .toString() ==
+                                                .toString() ==
+                                                "rejected"
+                                                ? Colors.red
+                                                : mission.accidentStatus
+                                                .toString() ==
+                                                "accepted"
+                                                ? Colors.blue
+                                                : Colors.grey)),
+                                    Row(
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .end,
+                                        children: [
+                                          Text(mission.time.toString()),
+                                        ]),
+                                    Text(
+                                      mission.accidentId.toString(),
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          color: mission.accidentStatus
+                                              .toString() ==
                                               "new"
-                                          ? Colors.green
-                                          : mission.accidentStatus.toString() ==
-                                                  "rejected"
+                                              ? Colors.green
+                                              : mission.accidentStatus
+                                              .toString() ==
+                                              "rejected"
                                               ? Colors.red
                                               : mission.accidentStatus
-                                                          .toString() ==
-                                                      "accepted"
-                                                  ? Colors.blue
-                                                  : Colors.grey),
+                                              .toString() ==
+                                              "accepted"
+                                              ? Colors.blue
+                                              : Colors.grey),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    });
-              }),
-            ),
+                          );
+                        });
+                  }),
+                ),
 
-            // _buildContentView(),
-          ],
-        ),
-      ),
-    ));
+                // _buildContentView(),
+              ],
+            ),
+          ),
+
+        )
+
+    )
+
+    ;
   }
 
   Future<void> _requestPermissionForAndroid() async {
@@ -530,7 +555,7 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     final result = await Get.to(const NewMission(), arguments: mission);
     if (result != null) {
       //mission.getEMR(''); // call your own function here to refresh screen
-      controller!.getData(token);
+      controller!.getData();
     }
   }
 

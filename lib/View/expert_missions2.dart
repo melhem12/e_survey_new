@@ -53,15 +53,18 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 
   String? filter;
    MissionsViewModel controller =
-  Get.put(MissionsViewModel(initialToken: ""));
+  Get.put(MissionsViewModel());
 
 //  ExpertMissions({Key? key}) : super(key: key);
 
   @override
   void initState() {
+    _setupFirebaseMessaging();
+
     _initTokenAndController();
+    getPosition();
     _scrollController.addListener(_onScroll);
-    FirebaseMessaging.instance.subscribeToTopic(box.read("userId").toString());
+    _setupPeriodicUpdates();
     //initializeService() ;
 
 
@@ -74,13 +77,19 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     });
     print("///////////KKKKKKKKLLLLL");
 
-    getPosition();
-    Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
 
-      controller.getData(token);
-      // _position=   await getLatAndLong();
-      // await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
+  }
+
+  void _setupPeriodicUpdates() {
+    Timer.periodic(const Duration(seconds: 200), (Timer timer) async {
+      controller.refreshData();
     });
+  }
+
+
+  void _setupFirebaseMessaging() {
+    String userId = box.read("userId").toString();
+    FirebaseMessaging.instance.subscribeToTopic(userId);
   }
 
 
@@ -90,7 +99,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     if (storedToken != null) {
       setState(() {
         token = storedToken;
-        controller = Get.put(MissionsViewModel(initialToken: token));
       });
     }
   }
@@ -106,7 +114,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   Future<void> logout() async {
     await storage.delete(key: "token");
     await storage.delete(key: "refresh_token");
-
     box.remove("userId");
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Signin()));
@@ -167,7 +174,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
             InkWell(
                 child: const Icon(Icons.refresh_outlined),
                 onTap: () {
-                  controller.getData(token);
+                  controller.refreshData();
                 })
           ],
         ),
@@ -201,7 +208,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                   if (value.trim().isNotEmpty) {
                     controller.searchMission(value);
                   } else {
-                    controller.getData(token);
+                    controller.getData();
                   }
                 },
                 style: const TextStyle(
@@ -404,7 +411,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     final result = await Get.to(const NewMission(), arguments: mission);
     if (result != null) {
       //mission.getEMR(''); // call your own function here to refresh screen
-      controller.getData(token);
+      controller.getData();
       // Get.reloadAll(force: true ,key:key);
       //Get.reset();
     }
@@ -428,7 +435,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
         // Null check added
         controller!.currentPage++;
         controller!
-            .getData(controller!.initialToken, page: controller!.currentPage);
+            .getData(page: controller!.currentPage);
       }
     }
   }
