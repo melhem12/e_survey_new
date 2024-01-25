@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/utility/app_url.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,7 +27,7 @@ class MissionsViewModel extends GetxController {
   }
 
   Future<void> getData(String token, {int page = 0}) async {
-
+final token1 =await FlutterSecureStorage().read(key: "token");
     if (isLoading || !hasMoreData) return;
 
     isLoading = true;
@@ -34,7 +35,7 @@ class MissionsViewModel extends GetxController {
     http.Response response = await http.get(url, headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
-      'Authorization': 'Bearer $token'
+      'Authorization': 'Bearer $token1'
     });
 
     if (response.statusCode == 200) {

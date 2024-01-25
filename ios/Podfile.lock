@@ -69,6 +69,8 @@ PODS:
     - Flutter
   - flutter_phone_direct_caller (0.0.1):
     - Flutter
+  - flutter_secure_storage (6.0.0):
+    - Flutter
   - flutter_sound (9.2.13):
     - Flutter
     - flutter_sound_core (= 9.2.13)
@@ -166,6 +168,7 @@ DEPENDENCIES:
   - flutter_foreground_task (from `.symlinks/plugins/flutter_foreground_task/ios`)
   - flutter_native_image (from `.symlinks/plugins/flutter_native_image/ios`)
   - flutter_phone_direct_caller (from `.symlinks/plugins/flutter_phone_direct_caller/ios`)
+  - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
@@ -218,6 +221,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_native_image/ios"
   flutter_phone_direct_caller:
     :path: ".symlinks/plugins/flutter_phone_direct_caller/ios"
+  flutter_secure_storage:
+    :path: ".symlinks/plugins/flutter_secure_storage/ios"
   flutter_sound:
     :path: ".symlinks/plugins/flutter_sound/ios"
   geolocator_apple:
@@ -259,6 +264,7 @@ SPEC CHECKSUMS:
   flutter_foreground_task: 21ef182ab0a29a3005cc72cd70e5f45cb7f7f817
   flutter_native_image: 9c0b7451838484458e5b0fae007b86a4c2d4bdfe
   flutter_phone_direct_caller: bd2ffd297f371a8a6c7bfbba0196964ffe3c4358
+  flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
   flutter_sound: c60effa2a350fb977885f0db2fbc4c1ad5160900
   flutter_sound_core: 26c10e5832e76aaacfae252d8925232281c486ae
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
