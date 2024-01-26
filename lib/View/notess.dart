@@ -20,6 +20,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../Models/AppNotes.dart';
 import '../Models/MissionsModel.dart';
+import '../controllers/RefreshController.dart';
 import 'expert_missions2.dart';
 
 class NotessView extends StatefulWidget {
@@ -82,6 +83,29 @@ class _NotessViewState extends State<NotessView> {
       });
     });
     super.initState();
+  }
+
+  Future<void> saveAndFinish() async {
+    final RefreshController refreshController = Get.find<RefreshController>();
+    refreshController.needRefresh.value = true;
+
+    progress = true;
+    setState(() {});
+
+    Directory documentDirectory = await getApplicationCacheDirectory();
+    String audioFilePath = '${documentDirectory.path}/${_mPath}';
+    final token = await box.read(key: "token");
+
+    await TemaServiceApi().uploadNotes(
+        _mPath, _controller.text.toString(), token.toString(), m.accidentId);
+    await TemaServiceApi().updateAccidentStatus(
+        context, "completed", m.accidentId, token.toString());
+
+    progress = false;
+    setState(() {});
+    Platform.isIOS
+        ? Get.offAll(() => ExpertMissions2())
+        : Get.offAll(() => ExpertMissions());
   }
 
   @override
@@ -227,11 +251,7 @@ class _NotessViewState extends State<NotessView> {
       _mPath = '${appDocumentsDirectory.path}/tau_file.mp4';
 
       log("kkkkkkkkkkkkkkkkknnnnnnnnnnnn");
-      // bool exist = await File(audioFilePath).exists();
-      // if(exist){
-      //   await File(audioFilePath).delete() ;
-      //
-      // }
+
 
       File f = await File(_mPath).writeAsBytes(base64Decode(appNotes.voiceNote))
           as File;
@@ -240,11 +260,7 @@ class _NotessViewState extends State<NotessView> {
       //  file.writeAsBytesCompat(base64Decode(appNotes.voiceNote));
       log("nfffffff");
     }
-    // if(audioFile!=null){
-    //   print(audioFile);
-    //   await   audioPlayer.play(audioFile!.path, isLocal: true);
-    //esp
-    // }
+
     progress = false;
 
     setState(() {});
@@ -272,64 +288,6 @@ class _NotessViewState extends State<NotessView> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               _buildMultilineTextField(),
-                              //
-                              // Container(
-                              //   margin: const EdgeInsets.all(3),
-                              //   padding: const EdgeInsets.all(3),
-                              //   height: 80,
-                              //   width: double.infinity,
-                              //   alignment: Alignment.center,
-                              //   decoration: BoxDecoration(
-                              //     color: Color(0xFFFAF0E6),
-                              //     border: Border.all(
-                              //       color: Colors.indigo,
-                              //       width: 3,
-                              //     ),
-                              //   ),
-                              //   child: Row(children: [
-                              //     ElevatedButton(
-                              //       onPressed: getRecorderFn(),
-                              //       //color: Colors.white,
-                              //       //disabledColor: Colors.grey,
-                              //       child: Icon(_mRecorder!.isRecording ? Icons.stop : Icons.mic),
-                              //     ),
-                              //     SizedBox(
-                              //       width: 20,
-                              //     ),
-                              //     Text(_mRecorder!.isRecording
-                              //         ? 'Recording in progress'
-                              //         : 'Recorder is stopped'),
-                              //   ]),
-                              // ),
-                              // Container(
-                              //   margin: const EdgeInsets.all(3),
-                              //   padding: const EdgeInsets.all(3),
-                              //   height: 80,
-                              //   width: double.infinity,
-                              //   alignment: Alignment.center,
-                              //   decoration: BoxDecoration(
-                              //     color: Color(0xFFFAF0E6),
-                              //     border: Border.all(
-                              //       color: Colors.indigo,
-                              //       width: 3,
-                              //     ),
-                              //   ),
-                              //   child: Row(children: [
-                              //     ElevatedButton(
-                              //       onPressed: getPlaybackFn(),
-                              //       //color: Colors.white,
-                              //       //disabledColor: Colors.grey,
-                              //       child: Icon(_mPlayer!.isPlaying ? Icons.pause : Icons.play_arrow),
-                              //     ),
-                              //     SizedBox(
-                              //       width: 20,
-                              //     ),
-                              //     Text(_mPlayer!.isPlaying
-                              //         ? 'Playback in progress'
-                              //         : 'Player is stopped'),
-                              //   ]),
-                              // ),
-
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -445,8 +403,7 @@ class _NotessViewState extends State<NotessView> {
 
                                               progress = false;
                                               setState(() {});
-//   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-                                              // Get.to(ArrivationVerification(),arguments: m);
+
                                             },
                                             style: ElevatedButton.styleFrom(
                                                 primary: Colors.blue,
@@ -471,39 +428,7 @@ class _NotessViewState extends State<NotessView> {
                                                   fontSize: 17),
                                             ),
                                             onPressed: () async {
-                                              progress = true;
-                                              setState(() {});
-
-                                              Directory documentDirectory =
-                                                  await getApplicationCacheDirectory();
-                                              String audioFilePath =
-                                                  '${documentDirectory.path}/${_mPath}';
-                                              final token =
-                                                  await box.read(key: "token");
-
-                                              await TemaServiceApi()
-                                                  .uploadNotes(
-                                                      _mPath,
-                                                      _controller.text
-                                                          .toString(),
-                                                      token.toString(),
-                                                      m.accidentId);
-                                              await TemaServiceApi()
-                                                  .updateAccidentStatus(
-                                                      context,
-                                                      "completed",
-                                                      m.accidentId,
-                                                      token.toString());
-
-                                              progress = false;
-                                              setState(() {});
-                                              Platform.isIOS
-                                                  ? Get.offAll(
-                                                      () => ExpertMissions2())
-                                                  : Get.offAll(
-                                                      () => ExpertMissions());
-                                              //   tema.updateAccidentStatus("accepted", m.accidentId, box.read("token"));
-                                              // Get.to(ArrivationVerification(),arguments: m);
+                                              saveAndFinish();
                                             },
                                             style: ElevatedButton.styleFrom(
                                                 primary: Colors.blue,

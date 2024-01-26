@@ -26,7 +26,7 @@ class _TemaMenuState extends State<TemaMenu> {
     return    Scaffold(
         backgroundColor: Colors.grey,
         appBar: AppBar(
-          title: const Text("Arrive"),
+          title: const Text("القائمة"),
         ),
         body:Padding(
           padding: const EdgeInsets.all(8.0),
@@ -52,7 +52,7 @@ class _TemaMenuState extends State<TemaMenu> {
                   Container(
                     margin: new EdgeInsets.symmetric(vertical: 5.0),
 
-                    child: Text(m.accidentId,
+                    child: Text(m.accidentNotification,
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.blueGrey,

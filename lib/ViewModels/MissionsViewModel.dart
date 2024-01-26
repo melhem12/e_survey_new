@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class MissionsViewModel extends GetxController {
   int currentPage = 0;
-  final int pageSize = 10;
+  final int pageSize = 15;
   bool isLoading = false;
   bool hasMoreData = true;
 

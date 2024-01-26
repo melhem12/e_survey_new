@@ -19,6 +19,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:android_intent/android_intent.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import '../controllers/RefreshController.dart';
 import '../pages/signin.dart';
 
 void startCallback() {
@@ -34,40 +35,20 @@ class ExpertMissions extends StatefulWidget {
 
 class _ExpertMissionsState extends State<ExpertMissions> {
   late Position _position;
+  bool _isFetchingMoreData = false;
+  final RefreshController refreshController = Get.find<RefreshController>();
 
-  // final box = GetStorage();
-  // String token = "";
-  // String? filter;
-  // ReceivePort? _receivePort;
-  //
-  // final storage = new FlutterSecureStorage();
-  //
-  // ScrollController _scrollController = ScrollController();
-  //
-  //
-  // MissionsViewModel? controller;
 
-  // Position? _position;  // Made nullable
   final box = GetStorage();
   String token = "";
   String? filter;
   ReceivePort? _receivePort;
-    final storage = FlutterSecureStorage();
+  final storage = FlutterSecureStorage();
   ScrollController _scrollController = ScrollController();
+
   // MissionsViewModel? controller; // Already nullable
 
-
-
-
-  MissionsViewModel controller =
-  Get.put(MissionsViewModel());
-
-
-
-
-
-
-
+  MissionsViewModel controller = Get.put(MissionsViewModel());
 
   @override
   void initState() {
@@ -79,6 +60,17 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     _setupFirebaseMessaging();
     _setupForegroundTask();
     _setupPeriodicUpdates();
+    ever(refreshController.needRefresh, (_) {
+      if (refreshController.needRefresh.value) {
+        refreshData();
+        refreshController.needRefresh.value = false; // Reset the flag
+      }
+    });
+  }
+
+  void refreshData() {
+    // Logic to refresh your data
+    controller.refreshData();
   }
 
   void _setupFirebaseMessaging() {
@@ -108,7 +100,6 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     });
   }
 
-
   void _initTokenAndController() async {
     TemaServiceApi().refreshToken();
     String? storedToken = await storage.read(key: "token");
@@ -129,11 +120,16 @@ class _ExpertMissionsState extends State<ExpertMissions> {
   void _onScroll() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      if (controller != null) {
-        // Null check added
+      if (!_isFetchingMoreData && controller != null) {
+        setState(() {
+          _isFetchingMoreData = true;
+        });
         controller.currentPage++;
-        controller
-            .getData( page: controller!.currentPage);
+        controller.getData(page: controller.currentPage).then((_) {
+          setState(() {
+            _isFetchingMoreData = false;
+          });
+        });
       }
     }
   }
@@ -183,249 +179,238 @@ class _ExpertMissionsState extends State<ExpertMissions> {
 
     return WithForegroundTask(
         child: Scaffold(
-          drawer: Drawer(
-            child: drawerItems,
-          ),
-          bottomNavigationBar:
+      drawer: Drawer(
+        child: drawerItems,
+      ),
+      bottomNavigationBar:
           GetStorage().read('status') == "on" ? _bottomBar() : _bottomBarRed(),
-          appBar: AppBar(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                const Text("قائمة الطلبات"),
-                InkWell(
-                    child: const Icon(Icons.refresh_outlined),
-                    onTap: () {
-                      controller?.refreshData();
-                    })
-              ],
-            ),
-            centerTitle: false,
-            actions: <Widget>[
-              PopupMenuButton<int>(
-                itemBuilder: (context) => [],
-              )
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    onChanged: (String value) {
-                      filter = value;
-                      if (value
-                          .trim()
-                          .isNotEmpty) {
-                        controller!.searchMission(value);
-                      } else {
-                        controller!.getData();
-                      }
-                    },
-                    style: const TextStyle(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            const Text("قائمة الطلبات"),
+            InkWell(
+                child: const Icon(Icons.refresh_outlined),
+                onTap: () {
+                  controller?.refreshData();
+                })
+          ],
+        ),
+        centerTitle: false,
+        actions: <Widget>[
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [],
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: TextField(
+                onChanged: (String value) {
+                  filter = value;
+                  if (value.trim().isNotEmpty) {
+                    controller!.searchMission(value);
+                  } else {
+                    controller!.getData();
+                  }
+                },
+                style: const TextStyle(
+                  color: Colors.blue,
+                ),
+                decoration: InputDecoration(
+                  labelStyle: const TextStyle(
+                    color: Colors.blue,
+                  ),
+                  labelText: 'Filter',
+                  isDense: true,
+                  fillColor: Colors.grey[300],
+                  filled: true,
+                  hintStyle: const TextStyle(
+                    color: Colors.blue,
+                  ),
+                  border: InputBorder.none,
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(
                       color: Colors.blue,
                     ),
-                    decoration: InputDecoration(
-                      labelStyle: const TextStyle(
-                        color: Colors.blue,
-                      ),
-                      labelText: 'Filter',
-                      isDense: true,
-                      fillColor: Colors.grey[300],
-                      filled: true,
-                      hintStyle: const TextStyle(
-                        color: Colors.blue,
-                      ),
-                      border: InputBorder.none,
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.blue,
-                        ),
-                      ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Row(
+                children: const <Widget>[
+                  Expanded(
+                    child: Card(
+                      color: Colors.green,
+                      child: Text(""),
                     ),
+                    flex: 1,
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    children: const <Widget>[
-                      Expanded(
-                        child: Card(
-                          color: Colors.green,
-                          child: Text(""),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Card(
-                          color: Colors.blue,
-                          child: Text(""),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Card(
-                          color: Colors.red,
-                          child: Text(""),
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Card(
-                          color: Colors.grey,
-                          child: Text(""),
-                        ),
-                        flex: 1,
-                      )
-                    ],
+                  Expanded(
+                    child: Card(
+                      color: Colors.blue,
+                      child: Text(""),
+                    ),
+                    flex: 1,
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    children: const <Widget>[
-                      Expanded(
-                        child: Text(
-                          "جديد",
-                          textAlign: TextAlign.center,
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Text(
-                          "قيد المعالجة",
-                          textAlign: TextAlign.center,
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Text(
-                          "لم يلب",
-                          textAlign: TextAlign.center,
-                        ),
-                        flex: 1,
-                      ),
-                      Expanded(
-                        child: Text(
-                          "مغلق",
-                          textAlign: TextAlign.center,
-                        ),
-                        flex: 1,
-                      )
-                    ],
+                  Expanded(
+                    child: Card(
+                      color: Colors.red,
+                      child: Text(""),
+                    ),
+                    flex: 1,
                   ),
-                ),
-                Expanded(
-                  flex: 17,
-                  child: Obx(() {
-                    if (controller.missions.isEmpty) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    return ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(10.0),
-                        itemCount: controller.missions.length,
-                        itemBuilder: (context,
-                            index,) {
-                          final Mission mission = controller.missions[index];
-                          print(
-                              'mission ${mission.accidentId}: ${mission
-                                  .accidentStatus}');
-                          return InkWell(
-                            key: ValueKey(mission.accidentId),
+                  Expanded(
+                    child: Card(
+                      color: Colors.grey,
+                      child: Text(""),
+                    ),
+                    flex: 1,
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Row(
+                children: const <Widget>[
+                  Expanded(
+                    child: Text(
+                      "جديد",
+                      textAlign: TextAlign.center,
+                    ),
+                    flex: 1,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "قيد المعالجة",
+                      textAlign: TextAlign.center,
+                    ),
+                    flex: 1,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "لم يلب",
+                      textAlign: TextAlign.center,
+                    ),
+                    flex: 1,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "مغلق",
+                      textAlign: TextAlign.center,
+                    ),
+                    flex: 1,
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 17,
+              child: Obx(() {
+                if (controller.missions.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(10.0),
+                    itemCount: controller.missions.length +
+                        (_isFetchingMoreData ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= controller.missions.length) {
+                        // If it's the last item and we are fetching data, show spinner
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                            onTap: () =>
+                      final Mission mission = controller.missions[index];
+                      print(
+                          'mission ${mission.accidentId}: ${mission.accidentStatus}');
+                      return InkWell(
+                        key: ValueKey(mission.accidentId),
+
+                        onTap: () => {
+                          if (mission.accidentStatus.toString() == "new")
+                            {_navigateAndRefresh(context, mission)}
+                          else if (mission.accidentStatus.toString() ==
+                              "accepted")
                             {
-                              if (mission.accidentStatus.toString() == "new")
-                                {_navigateAndRefresh(context, mission)}
+                              if (mission.accdentArrivedStatus == true)
+                                {Get.to(TemaMenu(), arguments: mission)}
                               else
-                                if (mission.accidentStatus.toString() ==
-                                    "accepted")
-                                  {
-                                    if (mission.accdentArrivedStatus == true)
-                                      {Get.to(TemaMenu(), arguments: mission)}
-                                    else
-                                      {
-                                        Get.to(AcceptedMission(),
-                                            arguments: mission)
-                                      }
-                                  }
-                            },
-                            //
-                            child: Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        mission.accidentCustomerName.toString(),
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                            color:
+                                {Get.to(AcceptedMission(), arguments: mission)}
+                            }
+                        },
+                        //
+                        child: Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(mission.accidentCustomerName.toString(),
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        color:
                                             mission.accidentStatus.toString() ==
-                                                "new"
+                                                    "new"
                                                 ? Colors.green
                                                 : mission.accidentStatus
-                                                .toString() ==
-                                                "rejected"
-                                                ? Colors.red
-                                                : mission.accidentStatus
-                                                .toString() ==
-                                                "accepted"
-                                                ? Colors.blue
-                                                : Colors.grey)),
-                                    Row(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .end,
-                                        children: [
-                                          Text(mission.time.toString()),
-                                        ]),
-                                    Text(
-                                      mission.accidentId.toString(),
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          color: mission.accidentStatus
-                                              .toString() ==
+                                                            .toString() ==
+                                                        "rejected"
+                                                    ? Colors.red
+                                                    : mission.accidentStatus
+                                                                .toString() ==
+                                                            "accepted"
+                                                        ? Colors.blue
+                                                        : Colors.grey)),
+                                Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(mission.time.toString()),
+                                    ]),
+                                Text(
+                                  mission.accidentNotification.toString(),
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: mission.accidentStatus
+                                                  .toString() ==
                                               "new"
-                                              ? Colors.green
-                                              : mission.accidentStatus
-                                              .toString() ==
-                                              "rejected"
+                                          ? Colors.green
+                                          : mission.accidentStatus.toString() ==
+                                                  "rejected"
                                               ? Colors.red
                                               : mission.accidentStatus
-                                              .toString() ==
-                                              "accepted"
-                                              ? Colors.blue
-                                              : Colors.grey),
-                                    ),
-                                  ],
+                                                          .toString() ==
+                                                      "accepted"
+                                                  ? Colors.blue
+                                                  : Colors.grey),
                                 ),
-                              ),
+                              ],
                             ),
-                          );
-                        });
-                  }),
-                ),
-
-                // _buildContentView(),
-              ],
+                          ),
+                        ),
+                      );
+                    });
+              }),
             ),
-          ),
 
-        )
-
-    )
-
-    ;
+            // _buildContentView(),
+          ],
+        ),
+      ),
+    ));
   }
 
   Future<void> _requestPermissionForAndroid() async {
@@ -456,7 +441,7 @@ class _ExpertMissionsState extends State<ExpertMissions> {
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
         channelDescription:
-            'This notification appears when the foreground service is running.',
+            'This notification appears when the aforeground service is running.',
         channelImportance: NotificationChannelImportance.HIGH,
         priority: NotificationPriority.HIGH,
         iconData: const NotificationIconData(
@@ -579,17 +564,17 @@ class _ExpertMissionsState extends State<ExpertMissions> {
 
   Future<Position?> getLatAndLong() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
-      return null;  // Return null if location service is not enabled
+      return null; // Return null if location service is not enabled
     }
     try {
-      _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      _position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       return _position;
     } catch (e) {
       // Handle exception (e.g., location permissions are denied)
       return null;
     }
   }
-
 
   Future _gpsService() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
@@ -705,8 +690,6 @@ class MyTaskHandler extends TaskHandler {
 //  int _eventCount = 0;
   late Position _position;
 
-
-
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
@@ -714,12 +697,14 @@ class MyTaskHandler extends TaskHandler {
         await FlutterForegroundTask.getData<String>(key: 'customData');
     print('customData: $customData');
   }
+
   Future<Position?> getLatAndLong() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
-      return null;  // Return null if location service is not enabled
+      return null; // Return null if location service is not enabled
     }
     try {
-      _position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      _position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
       return _position;
     } catch (e) {
       // Handle exception (e.g., location permissions are denied)

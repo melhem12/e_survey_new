@@ -26,6 +26,7 @@ import 'package:android_intent/android_intent.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../controllers/RefreshController.dart';
 import '../pages/signin.dart';
 
 // The callback function should always be a top-level function.
@@ -46,6 +47,8 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   final box = GetStorage();
   late String token;
 
+  bool _isFetchingMoreData = false;
+  final RefreshController refreshController = Get.find<RefreshController>();
 
   ScrollController _scrollController = ScrollController();
 
@@ -59,12 +62,18 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 
   @override
   void initState() {
-    _setupFirebaseMessaging();
-
-    _initTokenAndController();
     getPosition();
+    _setupFirebaseMessaging();
+    _initTokenAndController();
     _scrollController.addListener(_onScroll);
     _setupPeriodicUpdates();
+    ever(refreshController.needRefresh, (_) {
+      if (refreshController.needRefresh.value) {
+        refreshData();
+        refreshController.needRefresh.value = false; // Reset the flag
+      }
+    });
+
     //initializeService() ;
 
 
@@ -79,6 +88,12 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 
 
   }
+  void refreshData() {
+    // Logic to refresh your data
+    controller.refreshData();
+  }
+
+
 
   void _setupPeriodicUpdates() {
     Timer.periodic(const Duration(seconds: 200), (Timer timer) async {
@@ -312,13 +327,16 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                 }
 
                 return ListView.builder(
-                    padding: const EdgeInsets.all(10.0),
-                    itemCount: controller.missions.length,
                     controller: _scrollController,
-                    itemBuilder: (
-                      context,
-                      index,
-                    ) {
+                    padding: const EdgeInsets.all(10.0),
+                    itemCount: controller.missions.length +
+                        (_isFetchingMoreData ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= controller.missions.length) {
+                        // If it's the last item and we are fetching data, show spinner
+                        return Center(child: CircularProgressIndicator());
+                      }
+
                       final Mission mission = controller.missions[index];
                       print(
                           'mission ${mission.accidentId}: ${mission.accidentStatus}');
@@ -371,7 +389,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                                       Text(mission.time.toString()),
                                     ]),
                                 Text(
-                                  mission.accidentId.toString(),
+                                  mission.accidentNotification.toString(),
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: mission.accidentStatus
@@ -431,14 +449,20 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   void _onScroll() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      if (controller != null) {
-        // Null check added
-        controller!.currentPage++;
-        controller!
-            .getData(page: controller!.currentPage);
+      if (!_isFetchingMoreData && controller != null) {
+        setState(() {
+          _isFetchingMoreData = true;
+        });
+        controller.currentPage++;
+        controller.getData(page: controller.currentPage).then((_) {
+          setState(() {
+            _isFetchingMoreData = false;
+          });
+        });
       }
     }
   }
+
   // Future<Position> getLatAndLong() async {
   //   // _position=await Geolocator.getCurrentPosition().then((value) => value);
   //   _position = await Geolocator.getCurrentPosition(

@@ -33,8 +33,8 @@ import 'View/damage_part.dart';
 import 'View/expert_missions2.dart';
 import 'ViewModels/MissionsViewModel.dart';
 import 'args/claimsListArgs.dart';
+import 'controllers/RefreshController.dart';
 import 'firebase_options.dart';
-
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -43,58 +43,37 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   print("Handling a background message: ${message.messageId}");
 }
-void  main()  async=>
-    {
-  //Get.find().scheduleTimeout(5000),
 
-WidgetsFlutterBinding.ensureInitialized(),
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+void main() async => {
+      Get.put(RefreshController()), // Initializing the controller
+
+//Get.find().scheduleTimeout(5000),
+
+      WidgetsFlutterBinding.ensureInitialized(),
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform),
 
       await GetStorage.init(),
 
+      FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler),
 
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Got a message whilst in the foreground!');
+        print('Message data: ${message.data}');
 
-FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler),
-
-FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-print('Got a message whilst in the foreground!');
-print('Message data: ${message.data}');
-
-if (message.notification != null) {
-print('Message also contained a notification: ${message.notification}');
-}
-}),
+        if (message.notification != null) {
+          print(
+              'Message also contained a notification: ${message.notification}');
+        }
+      }),
 
       runApp(GetMaterialApp(
         initialRoute: '/',
-// onGenerateRoute: (settings){
-//   if(settings.name==DataInputPersonalInformation.routeName){
-//     final args = settings.arguments as claimsListArgs ;
-//     log("tttttttttttttttt");
-//     log(args.carId);
-//     log("tttttttttttttttt");
-//     return MaterialPageRoute(
-//       builder: (context) {
-//         return  DataInputPersonalInformation(
-//           companyCode: args.companyCode.toString(),
-//           carId: args.carId.toString(),
-//
-//           vehicleNumber: args.vehicleNumber.toString(),
-//         );
-//       },
-//     );
-//   }
-// },
-//         getPages: [
-//         //  GetPage(name: '/', page: () => const MyHomePage()),
-//           GetPage(name: '/newM', page: () =>  NewMission()),
-//          // GetPage(name: '/', page: () =>  Signin()),
-//         ],
         routes: {
           '/home': (context) => Home(),
           '/missions2': (context) => ExpertMissions2(),
           '/missions': (context) => ExpertMissions(),
-
           '/dashboard': (context) => Dashboard(),
           '/': (context) => Signin(),
           '/mySurvey': (context) => mySurvey(),
@@ -107,8 +86,5 @@ print('Message also contained a notification: ${message.notification}');
           '/HistorySearch': (context) => HistorySearch(),
           '/policy': (context) => Policy(),
         },
-
       ))
-
-    }
-    ;
+    };
