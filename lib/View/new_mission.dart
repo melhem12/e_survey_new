@@ -60,7 +60,7 @@ class _NewMissionState extends State<NewMission> {
                             Container(
                               margin: new EdgeInsets.symmetric(vertical: 5.0),
 
-                              child: Text(m.accidentId,
+                              child: Text(m.accidentNotification,
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.blueGrey,
