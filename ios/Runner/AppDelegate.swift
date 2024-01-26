@@ -153,7 +153,7 @@ func getUserLocation() {
     
     
     func sendLocationToAPIWithToken(latitude: Double, longitude: Double) {
-          let apiUrl = "http://185.37.232.39:8087/api/v1/temaController/updateGeoLocation" // Replace with your API endpoint URL
+          let apiUrl = "http://192.168.0.50:8087/v1/api/tema/updateGeoLocation" // Replace with your API endpoint URL
 
           guard let url = URL(string: apiUrl) else {
               print("Invalid API URL")

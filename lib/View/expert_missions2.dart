@@ -528,7 +528,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                   //   service.invoke('stopService');
                   // }
 
-                  sendToNative(0);
+                  sendToNative(0,token);
 
                   setState(() {
                     GetStorage().write("status", "off");
@@ -563,7 +563,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
             onPressed: () async {
               GetStorage().write("status", "on");
 
-              sendToNative(2);
+              sendToNative(2,token);
 
               // final service = FlutterBackgroundService();
               // var isRunning = await service.isRunning();
@@ -586,14 +586,14 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     );
   }
 
-  Future<void> sendToNative(int val) async {
+  Future<void> sendToNative(int val,String token) async {
     const MethodChannel _channel =
         const MethodChannel("FlutterFramework/swift_native");
 
     final arguments = {
       'value1': val,
       'value2': 3,
-      'token': box.read('token'),
+      'token': token,
     };
 
     final result = await _channel.invokeMethod('getSum', arguments);
