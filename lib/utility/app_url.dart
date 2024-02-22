@@ -1,9 +1,9 @@
 class AppUrl {
 
-  static const String baseUrl = 'http://192.168.16.106:8087/v1/api/tema';
+  static const String baseUrl = 'https://next3.claims-express.net/v1/api/tema';
 
-  static const String login = 'http://192.168.16.106:8001/v1/api/auth/login';
-  static const String  refresh_token_app = 'http://192.168.16.106:8001/v1/api/auth/refresh-token-app';
+  static const String login = 'https://next3.claims-express.net/v1/api/auth/login';
+  static const String  refresh_token_app = 'https://next3.claims-express.net/v1/api/auth/refresh-token-app';
 
  // static const String forgotPassword = baseUrl + '/forgot_password';
   static const String dailySurvey = baseUrl + '/esurveyController/getDailySurvey?userId=';
