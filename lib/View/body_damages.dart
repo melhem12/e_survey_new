@@ -59,7 +59,7 @@ class _BodyDamageViewState extends State<BodyDamageView> {
           final token = await box.read(key: "token");
 
           await TemaServiceApi()
-              .updateCarsAppBodly(m.accidentId, token.toString(), appBodly);
+              .updateCarsAppBodly(m.accidentId, token.toString(), appBodly,context);
           progress = false;
           setState(() {});
           return true;
@@ -438,7 +438,7 @@ class _BodyDamageViewState extends State<BodyDamageView> {
                                 final token = await box.read(key: "token");
 
                                 await TemaServiceApi().updateCarsAppBodly(
-                                    m.accidentId, token.toString(), appBodly);
+                                    m.accidentId, token.toString(), appBodly,context);
                                 progress = false;
                                 setState(() {});
                                 Get.back(result: 'hello');
@@ -490,7 +490,7 @@ class _BodyDamageViewState extends State<BodyDamageView> {
                                 final token = await box.read(key: "token");
 
                                 await TemaServiceApi().updateCarsAppBodly(
-                                    m.accidentId, token.toString(), appBodly);
+                                    m.accidentId, token.toString(), appBodly,context);
 
                                 Get.to(NotessView(), arguments: m);
                               },
@@ -512,7 +512,7 @@ class _BodyDamageViewState extends State<BodyDamageView> {
     final token = await box.read(key: "token");
 
     appBodly =
-        await TemaServiceApi().getCarsAppBodly(token.toString(), m.accidentId);
+        await TemaServiceApi().getCarsAppBodly(token.toString(), m.accidentId,context);
     progress = false;
     setState(() {});
   }

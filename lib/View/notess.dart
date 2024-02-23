@@ -97,7 +97,7 @@ class _NotessViewState extends State<NotessView> {
     final token = await box.read(key: "token");
 
     await TemaServiceApi().uploadNotes(
-        _mPath, _controller.text.toString(), token.toString(), m.accidentId);
+        _mPath, _controller.text.toString(), token.toString(), m.accidentId,context);
     await TemaServiceApi().updateAccidentStatus(
         context, "completed", m.accidentId, token.toString());
 
@@ -352,7 +352,7 @@ class _NotessViewState extends State<NotessView> {
                                                       _controller.text
                                                           .toString(),
                                                       token.toString(),
-                                                      m.accidentId);
+                                                      m.accidentId,context);
 
                                               progress = false;
                                               setState(() {});
@@ -399,7 +399,7 @@ class _NotessViewState extends State<NotessView> {
                                                       _controller.text
                                                           .toString(),
                                                       token.toString(),
-                                                      m.accidentId);
+                                                      m.accidentId,context);
 
                                               progress = false;
                                               setState(() {});
@@ -453,7 +453,7 @@ class _NotessViewState extends State<NotessView> {
           final token = await box.read(key: "token");
 
           await TemaServiceApi().uploadNotes(_mPath,
-              _controller.text.toString(), token.toString(), m.accidentId);
+              _controller.text.toString(), token.toString(), m.accidentId,context);
 
           progress = false;
           setState(() {});

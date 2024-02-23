@@ -561,7 +561,7 @@ class _DamagePartState extends State<DamagePart> {
     String? token = await box.read(key: 'token');
 
     await TemaServiceApi()
-        .updateCarsAppDamageParts(parts, token.toString(), m.accidentId);
+        .updateCarsAppDamageParts(parts, token.toString(), m.accidentId,context);
 
     screenshotController
         .capture(delay: Duration(milliseconds: 10))
@@ -571,7 +571,7 @@ class _DamagePartState extends State<DamagePart> {
       String? token = await box.read(key: 'token');
 
       await TemaServiceApi().updateCarsAppDamagePartsPic(
-          token.toString(), m.accidentId, capturedImage!);
+          token.toString(), m.accidentId, capturedImage!,context);
     }).catchError((onError) {
       print(onError);
     });
@@ -586,7 +586,7 @@ class _DamagePartState extends State<DamagePart> {
     String? token = await box.read(key: 'token');
 
     damageList = await TemaServiceApi()
-        .getCarsAppDamageParts(token.toString(), m.accidentId);
+        .getCarsAppDamageParts(token.toString(), m.accidentId,context);
     checkRightFrontDoor = damageList
         .where((element) => element.damagesPartsPartId == "1482")
         .isNotEmpty;

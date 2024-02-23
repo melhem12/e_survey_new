@@ -108,13 +108,13 @@ class _NotesviewState extends State<Notesview> {
                 audioFile!.path,
                 _controller.text.toString(),
                 GetStorage().read('token'),
-                m.accidentId);
+                m.accidentId,context);
           } else {
             await TemaServiceApi().uploadNotes(
                 null,
                 _controller.text.toString(),
                 GetStorage().read('token'),
-                m.accidentId);
+                m.accidentId,context);
           }
           progress = false;
           setState(() {});
@@ -280,7 +280,7 @@ class _NotesviewState extends State<Notesview> {
                                                             .toString(),
                                                         GetStorage()
                                                             .read('token'),
-                                                        m.accidentId);
+                                                        m.accidentId,context);
                                               } else {
                                                 await TemaServiceApi()
                                                     .uploadNotes(
@@ -289,7 +289,7 @@ class _NotesviewState extends State<Notesview> {
                                                             .toString(),
                                                         GetStorage()
                                                             .read('token'),
-                                                        m.accidentId);
+                                                        m.accidentId,context);
                                               }
                                               progress = false;
                                               setState(() {});
@@ -330,7 +330,7 @@ class _NotesviewState extends State<Notesview> {
                                                             .toString(),
                                                         GetStorage()
                                                             .read('token'),
-                                                        m.accidentId);
+                                                        m.accidentId,context);
                                               } else {
                                                 await TemaServiceApi()
                                                     .uploadNotes(
@@ -339,7 +339,7 @@ class _NotesviewState extends State<Notesview> {
                                                             .toString(),
                                                         GetStorage()
                                                             .read('token'),
-                                                        m.accidentId);
+                                                        m.accidentId,context);
                                               }
 
                                               progress = false;
@@ -381,7 +381,7 @@ class _NotesviewState extends State<Notesview> {
                                                             .toString(),
                                                         GetStorage()
                                                             .read('token'),
-                                                        m.accidentId);
+                                                        m.accidentId,context);
                                                 await TemaServiceApi()
                                                     .updateAccidentStatus(
                                                         context,
@@ -397,7 +397,7 @@ class _NotesviewState extends State<Notesview> {
                                                             .toString(),
                                                         GetStorage()
                                                             .read('token'),
-                                                        m.accidentId);
+                                                        m.accidentId,context);
                                                 await TemaServiceApi()
                                                     .updateAccidentStatus(
                                                         context,

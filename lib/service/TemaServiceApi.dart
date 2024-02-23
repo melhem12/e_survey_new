@@ -341,8 +341,8 @@ class TemaServiceApi {
   }
 
   Future uploadImage(
-      String filename, String name, String token, String accidentId) async {
-    refreshToken();
+      String filename, String name, String token, String accidentId,BuildContext context) async {
+    refreshToken(context);
 
     var request = http.MultipartRequest(
         'POST',
@@ -364,8 +364,8 @@ class TemaServiceApi {
     var res = await request.send();
   }
 
-  Future<AppBodly> getCarsAppBodly(String token, String accidentId) async {
-    refreshToken();
+  Future<AppBodly> getCarsAppBodly(String token, String accidentId,BuildContext context) async {
+    refreshToken(context);
     final url = Uri.parse(AppUrl.getCarsAppBodly + "?accidentId=" + accidentId);
     http.Response response = await http.get(url, headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -384,8 +384,8 @@ class TemaServiceApi {
   }
 
   Future<List<AppDamagePartResponse>> getCarsAppDamageParts(
-      String token, String accidentId) async {
-    refreshToken();
+      String token, String accidentId,BuildContext context) async {
+    refreshToken(context);
 
     final url =
         Uri.parse(AppUrl.getCarsAppDamageParts + "?accidentId=" + accidentId);
@@ -407,8 +407,8 @@ class TemaServiceApi {
   }
 
   Future<void> updateCarsAppBodly(
-      String accidentId, String token, AppBodly myAppBodly) async {
-    refreshToken();
+      String accidentId, String token, AppBodly myAppBodly,BuildContext context) async {
+    refreshToken(context);
 
     var response = await http.post(
       Uri.parse(AppUrl.updateCarsAppBodly),
@@ -434,8 +434,8 @@ class TemaServiceApi {
   }
 
   Future uploadNotes(String? filename, String notesRemark, String token,
-      String carsAppAccidentId) async {
-    refreshToken();
+      String carsAppAccidentId,BuildContext context) async {
+    refreshToken(context);
 
     var request = http.MultipartRequest(
       'POST',
@@ -503,7 +503,7 @@ class TemaServiceApi {
     }
   }
 
-  Future<void> refreshToken() async {
+  Future<void> refreshToken(BuildContext context) async {
     final url = Uri.parse(AppUrl.refresh_token_app);
     final box = FlutterSecureStorage();
 
@@ -530,6 +530,9 @@ class TemaServiceApi {
             key: 'refresh_token',
             value: refreshToken); // Use consistent key name
       } else {
+        Navigator.of(context).pop();
+
+
         // Handle different status codes or add a general error log
         log('Request failed with status: ${response.statusCode}.');
       }
@@ -572,8 +575,8 @@ class TemaServiceApi {
   Future<bool> updateCarsAppDamageParts(
       List<AppDamagePartResponse> damagedParts,
       String token,
-      String accidentId) async {
-    refreshToken();
+      String accidentId,BuildContext context) async {
+    refreshToken(context);
 
     // log(damagedParts[0].surveyDamagedSeverity.toString());
 
@@ -598,8 +601,8 @@ class TemaServiceApi {
   }
 
   Future<bool> updateCarsAppDamagePartsPic(
-      String token, String accidentId, Uint8List capturedImage) async {
-    refreshToken();
+      String token, String accidentId, Uint8List capturedImage,BuildContext context) async {
+    refreshToken(context);
     try {
       // Add the image as a MultipartFile
       http.MultipartFile multipartFile = http.MultipartFile.fromBytes(

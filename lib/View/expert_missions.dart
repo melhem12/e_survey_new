@@ -101,7 +101,7 @@ class _ExpertMissionsState extends State<ExpertMissions> {
   }
 
   void _initTokenAndController() async {
-    TemaServiceApi().refreshToken();
+    TemaServiceApi().refreshToken(context);
     String? storedToken = await storage.read(key: "token");
     if (storedToken != null) {
       setState(() {
