@@ -138,8 +138,8 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
   @override
   Widget build(BuildContext context) {
     var drawerHeader = UserAccountsDrawerHeader(
-      accountName: Text(GetStorage().read("userId")),
-      accountEmail: Text(box.read("userId")),
+      accountName: Text(box.read("userId").toString()),
+      accountEmail: Text(box.read("userId").toString()),
       currentAccountPicture: CircleAvatar(
         backgroundColor: Colors.white,
         child: Icon(

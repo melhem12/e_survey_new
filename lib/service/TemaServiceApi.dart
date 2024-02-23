@@ -19,6 +19,7 @@ import '../Models/LoginResponse.dart';
 import '../Models/Responsability.dart';
 import '../View/expert_missions.dart';
 import '../View/expert_missions2.dart';
+import '../pages/signin.dart';
 
 class TemaServiceApi {
   List<AppDamage> appDamages = [];
@@ -530,16 +531,29 @@ class TemaServiceApi {
             key: 'refresh_token',
             value: refreshToken); // Use consistent key name
       } else {
-        Navigator.of(context).pop();
+
 
 
         // Handle different status codes or add a general error log
         log('Request failed with status: ${response.statusCode}.');
+        logout( context);
       }
     } catch (error) {
       log('An error occurred: $error');
+      logout( context);
     }
   }
+
+
+  Future<void> logout(BuildContext context) async {
+    final storage = FlutterSecureStorage();
+
+    await storage.delete(key: "token");
+    await storage.delete(key: "refresh_token");
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Signin()));
+  }
+
 
   Future<LoginResponse> login(
       String username, String password, BuildContext context) async {
