@@ -42,7 +42,7 @@ class ExpertMissions2 extends StatefulWidget {
   State<ExpertMissions2> createState() => _ExpertMissions2State();
 }
 
-class _ExpertMissions2State extends State<ExpertMissions2> {
+class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingObserver {
   late Position _position;
   final box = GetStorage();
   late String token;
@@ -66,7 +66,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     _setupFirebaseMessaging();
     _initTokenAndController();
     _scrollController.addListener(_onScroll);
-    _setupPeriodicUpdates();
+    // _setupPeriodicUpdates();
     ever(refreshController.needRefresh, (_) {
       if (refreshController.needRefresh.value) {
         refreshData();
@@ -85,21 +85,23 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
 
     });
     print("///////////KKKKKKKKLLLLL");
-
+    WidgetsBinding.instance.addObserver(this);
 
   }
   void refreshData() {
+    TemaServiceApi().refreshToken(context);
     // Logic to refresh your data
     controller.refreshData();
+
   }
 
 
 
-  void _setupPeriodicUpdates() {
-    Timer.periodic(const Duration(seconds: 200), (Timer timer) async {
-      controller.refreshData();
-    });
-  }
+  // void _setupPeriodicUpdates() {
+  //   Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
+  //     controller.refreshData();
+  //   });
+  // }
 
 
   void _setupFirebaseMessaging() {
@@ -107,7 +109,15 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
     FirebaseMessaging.instance.subscribeToTopic(userId);
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      refreshData();
 
+      // Code to execute when the app is resumed
+      print('App resumed');
+    }
+  }
   void _initTokenAndController() async {
     TemaServiceApi().refreshToken(context);
     String? storedToken = await storage.read(key: "token");
@@ -367,22 +377,35 @@ class _ExpertMissions2State extends State<ExpertMissions2> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(mission.accidentCustomerName.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color:
-                                            mission.accidentStatus.toString() ==
-                                                    "new"
-                                                ? Colors.green
-                                                : mission.accidentStatus
-                                                            .toString() ==
-                                                        "rejected"
-                                                    ? Colors.red
-                                                    : mission.accidentStatus
-                                                                .toString() ==
-                                                            "accepted"
-                                                        ? Colors.blue
-                                                        : Colors.grey)),
+                                Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                    children: [
+                                      Text(mission.accidentCustomerName.toString(),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                              color:
+                                              mission.accidentStatus.toString() ==
+                                                  "new"
+                                                  ? Colors.green
+                                                  : mission.accidentStatus
+                                                  .toString() ==
+                                                  "rejected"
+                                                  ? Colors.red
+                                                  : mission.accidentStatus
+                                                  .toString() ==
+                                                  "accepted"
+                                                  ? Colors.blue
+                                                  : Colors.grey)),
+                                      Text(mission.date.toString(),
+                                          textAlign: TextAlign.right,
+                                          style: TextStyle()
+                                      ),
+
+                                    ]
+
+                                ),
+
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [

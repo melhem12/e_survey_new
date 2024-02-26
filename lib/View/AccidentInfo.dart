@@ -62,7 +62,7 @@ const   Text("insurer : ",  style: TextStyle(fontWeight: FontWeight.bold),),
       ],),
       Row(children:   [
         const   Text("Car : ",  style: TextStyle(fontWeight: FontWeight.bold),),
-        Text(m.accidentPolicyType),
+        Text(m.accidentBrand+" "+m.accidentTradeMark),
 
       ],),
       Row(children:   [
@@ -76,11 +76,11 @@ const   Text("insurer : ",  style: TextStyle(fontWeight: FontWeight.bold),),
 
       ],),
       Row(children:   [
-        Text("Inception: "+m.accidentPolicyInceptDate +" Expiry: "+m.accidentPolicyExpiryDate+" ...."),
+        Text("Inception: "+m.accidentPolicyInceptDate +" Expiry: "+m.accidentPolicyExpiryDate),
 
       ],),
       Row(children:   [
-        Text(m.accidentDetails),
+        Text(m.accidentPolicyDetails),
 
       ],),
     ]

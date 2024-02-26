@@ -87,7 +87,8 @@ class _AcceptedMissionState extends State<AcceptedMission> {
 
                             mainAxisSize: MainAxisSize.max,
                             children:<Widget> [
-                              Container(                              margin: new EdgeInsets.symmetric(vertical: 5.0),
+                              Container(
+                                  margin: new EdgeInsets.symmetric(vertical: 5.0),
 
                                   child: Icon(Icons.where_to_vote,color: Colors.blue,)),
                               Text(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:e_survey/Models/MissionsModel.dart';
+import 'package:e_survey/service/TemaServiceApi.dart';
 import 'package:e_survey/utility/app_url.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
@@ -22,10 +23,11 @@ class MissionsViewModel extends GetxController {
     super.onInit();
     refreshData(); // Initial data load
     // Set up automatic refresh every 60 seconds
-    Timer.periodic(Duration(seconds: 200), (Timer t) => refreshData());
+    // Timer.periodic(Duration(seconds: 10), (Timer t) => refreshData());
   }
 
   Future<void> getData({int page = 0}) async {
+
     final token1 = await FlutterSecureStorage().read(key: "token");
     if (isLoading || !hasMoreData) return;
 
@@ -59,22 +61,35 @@ class MissionsViewModel extends GetxController {
   }
 
   void refreshData() async {
+    missions.clear();
+
     currentPage = 0; // Reset to the first page
     hasMoreData = true; // Reset hasMoreData flag
     await getData( page: currentPage);
   }
 
   void searchMission(String query) {
-    final suggestions = missions.where((element) {
-      final accidentCustomerName = element.accidentCustomerName.toLowerCase();
-      final input = query.toLowerCase();
-      return accidentCustomerName.contains(input);
-    }).toList();
+    if (query.isEmpty) {
+      // If the search query is empty, reset to show all missions
 
-    if (suggestions != null) {
+      refreshData();
+
+      return;
+    }
+
+    final List<Mission> suggestions = missions
+        .where((mission) =>
+        mission.accidentCustomerName.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    if (suggestions.isNotEmpty) {
       log("Search results count: ${suggestions.length}");
+      // Update missions with search results
+      missions.assignAll(suggestions);
+    } else {
+      // If no matching missions found, clear the list
       missions.clear();
-      missions.addAll(suggestions);
     }
   }
+
 }

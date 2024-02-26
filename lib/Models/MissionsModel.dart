@@ -2,8 +2,8 @@
 //
 //     final missonsModel = missonsModelFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 MissonsModel missonsModelFromJson(String str) => MissonsModel.fromJson(json.decode(str));
 
@@ -113,7 +113,7 @@ class Mission {
     accidentStatus: json["accidentStatus"],
     accdentArrivedStatus: json["accdentArrivedStatus"],
     time: json["time"],
-    date: json["date"],
+    date:  DateFormat('yyyy-MM-dd').format(DateTime.parse(json["date"])),
    accidentMake :json["accidentMake"],
   );
 

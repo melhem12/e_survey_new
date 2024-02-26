@@ -33,22 +33,33 @@ class ExpertMissions extends StatefulWidget {
   State<ExpertMissions> createState() => _ExpertMissionsState();
 }
 
-class _ExpertMissionsState extends State<ExpertMissions> {
+class _ExpertMissionsState extends State<ExpertMissions>
+    with WidgetsBindingObserver {
   late Position _position;
   bool _isFetchingMoreData = false;
   final RefreshController refreshController = Get.find<RefreshController>();
-
 
   final box = GetStorage();
   String token = "";
   String? filter;
   ReceivePort? _receivePort;
+  RxBool _isRefreshing = false.obs;
   final storage = FlutterSecureStorage();
   ScrollController _scrollController = ScrollController();
 
   // MissionsViewModel? controller; // Already nullable
 
   MissionsViewModel controller = Get.put(MissionsViewModel());
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      refreshData();
+
+      // Code to execute when the app is resumed
+      print('App resumed');
+    }
+  }
 
   @override
   void initState() {
@@ -59,17 +70,23 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     getPosition();
     _setupFirebaseMessaging();
     _setupForegroundTask();
-    _setupPeriodicUpdates();
+    // _setupPeriodicUpdates();
     ever(refreshController.needRefresh, (_) {
       if (refreshController.needRefresh.value) {
         refreshData();
         refreshController.needRefresh.value = false; // Reset the flag
       }
     });
+    WidgetsBinding.instance.addObserver(this);
   }
 
-  void refreshData() {
-    // Logic to refresh your data
+  // void refreshData() {
+  //   // Logic to refresh your data
+  //   controller.refreshData();
+  // }
+
+  void refreshData() async {
+    TemaServiceApi().refreshToken(context);
     controller.refreshData();
   }
 
@@ -89,16 +106,16 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     });
   }
 
-  void _setupPeriodicUpdates() {
-    Timer.periodic(const Duration(seconds: 200), (Timer timer) async {
-      controller.refreshData();
-      // Position? currentPosition = await getLatAndLong();
-      // if (currentPosition != null) {
-      //   await TemaServiceApi().updateGeoLocation(
-      //       currentPosition.latitude.toString(), currentPosition.longitude.toString(), token);
-      // }
-    });
-  }
+  // void _setupPeriodicUpdates() {
+  //   Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
+  //     controller.refreshData();
+  //     // Position? currentPosition = await getLatAndLong();
+  //     // if (currentPosition != null) {
+  //     //   await TemaServiceApi().updateGeoLocation(
+  //     //       currentPosition.latitude.toString(), currentPosition.longitude.toString(), token);
+  //     // }
+  //   });
+  // }
 
   void _initTokenAndController() async {
     TemaServiceApi().refreshToken(context);
@@ -192,7 +209,7 @@ class _ExpertMissionsState extends State<ExpertMissions> {
             InkWell(
                 child: const Icon(Icons.refresh_outlined),
                 onTap: () {
-                  controller?.refreshData();
+                  refreshData();
                 })
           ],
         ),
@@ -203,7 +220,10 @@ class _ExpertMissionsState extends State<ExpertMissions> {
           )
         ],
       ),
-      body: Padding(
+      body:
+          // Show progress indicator
+
+          Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -359,22 +379,32 @@ class _ExpertMissionsState extends State<ExpertMissions> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(mission.accidentCustomerName.toString(),
-                                    textAlign: TextAlign.start,
-                                    style: TextStyle(
-                                        color:
-                                            mission.accidentStatus.toString() ==
-                                                    "new"
-                                                ? Colors.green
-                                                : mission.accidentStatus
-                                                            .toString() ==
-                                                        "rejected"
-                                                    ? Colors.red
-                                                    : mission.accidentStatus
-                                                                .toString() ==
-                                                            "accepted"
-                                                        ? Colors.blue
-                                                        : Colors.grey)),
+                                Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          mission.accidentCustomerName
+                                              .toString(),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                              color: mission.accidentStatus
+                                                          .toString() ==
+                                                      "new"
+                                                  ? Colors.green
+                                                  : mission.accidentStatus
+                                                              .toString() ==
+                                                          "rejected"
+                                                      ? Colors.red
+                                                      : mission.accidentStatus
+                                                                  .toString() ==
+                                                              "accepted"
+                                                          ? Colors.blue
+                                                          : Colors.grey)),
+                                      Text(mission.date.toString(),
+                                          textAlign: TextAlign.right,
+                                          style: TextStyle()),
+                                    ]),
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -448,17 +478,17 @@ class _ExpertMissionsState extends State<ExpertMissions> {
           resType: ResourceType.mipmap,
           resPrefix: ResourcePrefix.ic,
           name: 'launcher',
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.blue,
         ),
         buttons: [
           const NotificationButton(
             id: 'geoTracker',
-            text: 'geoTracker',
-            textColor: Colors.orange,
+            text: 'GEOTRACKER',
+            textColor: Colors.blue,
           ),
           const NotificationButton(
             id: 'testButton',
-            text: 'Test',
+            text: 'RUNNING.....',
             textColor: Colors.grey,
           ),
         ],
@@ -495,7 +525,7 @@ class _ExpertMissionsState extends State<ExpertMissions> {
       return FlutterForegroundTask.restartService();
     } else {
       return FlutterForegroundTask.startService(
-        notificationTitle: 'Foreground Service is running',
+        notificationTitle: 'Tema Service is running',
         notificationText: 'Tap to return to the app',
         callback: startCallback,
       );
@@ -540,7 +570,7 @@ class _ExpertMissionsState extends State<ExpertMissions> {
     final result = await Get.to(const NewMission(), arguments: mission);
     if (result != null) {
       //mission.getEMR(''); // call your own function here to refresh screen
-      controller!.getData();
+ refreshData();
     }
   }
 

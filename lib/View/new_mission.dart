@@ -11,10 +11,9 @@ import 'package:get_storage/get_storage.dart';
 
 import 'arrivation_2.dart';
 
-
-
 class NewMission extends StatefulWidget {
   const NewMission({Key? key}) : super(key: key);
+
   @override
   _NewMissionState createState() => _NewMissionState();
 }
@@ -22,158 +21,153 @@ class NewMission extends StatefulWidget {
 class _NewMissionState extends State<NewMission> {
   final box = FlutterSecureStorage();
 
-  late  Mission m  ;
+  late Mission m;
+
   @override
   void initState() {
-   m =  Get.arguments as Mission ;
+    m = Get.arguments as Mission;
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.grey,
       appBar: AppBar(title: Text("الحوادث المتوفرة")),
       body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-              children: <Widget>
-              [
-                Card(
-
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
+          child: Column(children: <Widget>[
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        child: Text(m.accidentCustomerName,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.blueGrey,
+                            )),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-
-                              child: Text(m.accidentCustomerName,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.blueGrey,
-                                  )),
-                            ),
-                            Container(
-                              margin: new EdgeInsets.symmetric(vertical: 5.0),
-
-                              child: Text(m.accidentNotification,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.blueGrey,
-                                  )),
-                            ),
-                            Container(
-                              margin: new EdgeInsets.symmetric(vertical: 5.0),
-
-                              child: Text(m.accidentCustomerPhone,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.blueGrey,
-                                  )),
-                            ),
-                            Container(
-                              margin: new EdgeInsets.symmetric(vertical: 5.0),
-
-                              child: Text(m.accidentMake,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.blueGrey,
-                                  )),
-                            ),
-
-SizedBox(
-  height: 40,
-  width: double.infinity,
-),
-                  Row(
-
-                    mainAxisSize: MainAxisSize.max,
-                    children:<Widget> [
-                      Container(                              margin: new EdgeInsets.symmetric(vertical: 5.0),
-
-                          child: Icon(Icons.where_to_vote,color: Colors.blue,)),
-                      Text(
-                        m.accidentlocation ,style: TextStyle(color: Colors.blue,  fontSize: 15,),)
-                    ],),
-
-
-                            SizedBox(
-                              height: 20,
-                              width: double.infinity,
-                            ),
-                  
-                  Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                      Expanded(
-                      flex: 1,
-                      child: Container(
-                        child: ElevatedButton(
-                          child: Text(
-                          "رفض",style: TextStyle(color: Colors.white ,fontSize: 17),
-                        ),
-                          onPressed: () async {
-TemaServiceApi tema = new TemaServiceApi();
-String? token = await box.read(key: 'token');
-
-await tema.updateAccidentStatus(context,"rejected", m.accidentId, token.toString());
-Get.back(result: 'hello');
-                          },
-                          style: ElevatedButton.styleFrom(
-                              primary: Colors.blue,
-                              textStyle: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight:
-                                  FontWeight.bold)),
-                        ),
-                      )),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      child: ElevatedButton(
-                        child: Text(
-                          "قبول",style: TextStyle(color: Colors.white
-                       ,fontSize: 17),
-                        ),
-                        onPressed: () async {
-                          TemaServiceApi tema = new TemaServiceApi();
-                          String? token = await box.read(key: 'token');
-
-                          tema.updateAccidentStatus(context,"accepted", m.accidentId, token.toString());
-Get.to(ArrivationVerification2(),arguments: m);
-                        },
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.blue,
-                            textStyle: TextStyle(
-                                fontSize: 30,
-                                fontWeight:
-                                FontWeight.bold)),
+                      Container(
+                        margin: new EdgeInsets.symmetric(vertical: 5.0),
+                        child: Text(m.accidentNotification,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.blueGrey,
+                            )),
                       ),
-                    ))
-                      ]
-                        ),
-
-                  ]
+                      Container(
+                        margin: new EdgeInsets.symmetric(vertical: 5.0),
+                        child: Text(m.accidentCustomerPhone,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.blueGrey,
+                            )),
                       ),
-                    ),
+                      Container(
+                        margin: new EdgeInsets.symmetric(vertical: 5.0),
+                        child: Text(m.accidentMake,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.blueGrey,
+                            )),
+                      ),
+                      SizedBox(
+                        height: 40,
+                        width: double.infinity,
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Container(
+                              margin: new EdgeInsets.symmetric(vertical: 5.0),
+                              child: Icon(
+                                Icons.where_to_vote,
+                                color: Colors.blue,
+                              )),
+                          Text(
+                            m.accidentlocation,
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 15,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20,
+                        width: double.infinity,
+                      ),
+                      Row(mainAxisSize: MainAxisSize.max, children: <Widget>[
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                              child: ElevatedButton(
+                                child: Text(
+                                  "رفض",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 17),
+                                ),
+                                onPressed: () async {
+                                  TemaServiceApi tema = new TemaServiceApi();
+                                  String? token = await box.read(key: 'token');
 
-)
+                                  await tema.updateAccidentStatus(
+                                      context,
+                                      "rejected",
+                                      m.accidentId,
+                                      token.toString());
+                                  Get.back(result: 'hello');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.blue,
+                                    textStyle: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                            )),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                              child: ElevatedButton(
+                                child: Text(
+                                  "قبول",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 17),
+                                ),
+                                onPressed: () async {
+                                  TemaServiceApi tema = new TemaServiceApi();
+                                  String? token = await box.read(key: 'token');
 
-              ]
-          )
-
-      )
-      ,
+                                  tema.updateAccidentStatus(context, "accepted",
+                                      m.accidentId, token.toString());
+                                  Get.to(ArrivationVerification2(),
+                                      arguments: m);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    primary: Colors.blue,
+                                    textStyle: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                            ))
+                      ]),
+                    ]),
+              ),
+            )
+          ])),
     );
   }
 }

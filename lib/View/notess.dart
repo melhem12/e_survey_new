@@ -90,7 +90,8 @@ class _NotessViewState extends State<NotessView> {
     refreshController.needRefresh.value = true;
 
     progress = true;
-    setState(() {});
+    setState(() {}
+    );
 
     Directory documentDirectory = await getApplicationCacheDirectory();
     String audioFilePath = '${documentDirectory.path}/${_mPath}';
