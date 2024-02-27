@@ -13,7 +13,7 @@ import CoreLocation
 
     private var bearerToken: String = ""
     private var myRefreshToken: String = ""
-     private var myTime: Int = 30
+     private var myTime: Int = 0
  private var locationManager: CLLocationManager?
     private var timer: Timer?
 
