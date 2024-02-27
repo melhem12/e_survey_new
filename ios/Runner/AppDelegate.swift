@@ -13,7 +13,7 @@ import CoreLocation
 
     private var bearerToken: String = ""
     private var myRefreshToken: String = ""
-     private var myTime: Int = 0
+     private var myTime: Int = 20
  private var locationManager: CLLocationManager?
     private var timer: Timer?
 
@@ -38,13 +38,13 @@ didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: An
                                     let value2 = args["value2"] as? Int,
                                     let token = args["token"] as? String,
                                      let refreshToken = args["refreshToken"] as? String,
-                                     let time = args["time"] as? Int
+                                     let  t = args["time"] as? Int
                                  {
                                      // Store the bearer token
                                      self?.bearerToken = token
                                      self?.myRefreshToken = refreshToken
-                                     self?.myTime = time
-
+                                     self?.myTime = t
+print("time paramms:",t)
                                      // Use the arguments as needed in your Swift code
                                      let sum = self?.getSum(value1: value1, value2: value2) ?? 0
                                      result(sum)
@@ -79,12 +79,13 @@ didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: An
     application.registerUserNotificationSettings(settings)
 }
 application.registerForRemoteNotifications()
-startTimer()
+    startTimer()
 return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
- func startTimer() {
-     timer = Timer.scheduledTimer(timeInterval: TimeInterval(myTime), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+    func startTimer() {
+        print("my time paramms:",self.myTime)
+     timer = Timer.scheduledTimer(timeInterval: TimeInterval( self.myTime) ,target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
         // Fire the timer immediately upon starting
         timer?.fire()
     }
