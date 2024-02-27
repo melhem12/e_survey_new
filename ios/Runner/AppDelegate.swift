@@ -13,6 +13,7 @@ import CoreLocation
 
     private var bearerToken: String = ""
     private var myRefreshToken: String = ""
+     private var myTime: Int = 30
  private var locationManager: CLLocationManager?
     private var timer: Timer?
 
@@ -36,12 +37,13 @@ didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: An
                    if let value1 = args["value1"] as? Int,
                                     let value2 = args["value2"] as? Int,
                                     let token = args["token"] as? String,
-                                     let refreshToken = args["refreshToken"] as? String
+                                     let refreshToken = args["refreshToken"] as? String,
+                                     let time = args["time"] as? Int,
                                  {
                                      // Store the bearer token
                                      self?.bearerToken = token
                                      self?.myRefreshToken = refreshToken
-
+                                     self?.myTime = time
 
                                      // Use the arguments as needed in your Swift code
                                      let sum = self?.getSum(value1: value1, value2: value2) ?? 0
@@ -82,7 +84,7 @@ return super.application(application, didFinishLaunchingWithOptions: launchOptio
   }
 
  func startTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: self?.myTime, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
         // Fire the timer immediately upon starting
         timer?.fire()
     }
