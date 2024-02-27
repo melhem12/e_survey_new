@@ -42,6 +42,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
   final box = GetStorage();
   String token = "";
   String? filter;
+  late String refreshToken;
   ReceivePort? _receivePort;
   RxBool _isRefreshing = false.obs;
   final storage = FlutterSecureStorage();
@@ -117,15 +118,22 @@ class _ExpertMissionsState extends State<ExpertMissions>
   //   });
   // }
 
+
+
   void _initTokenAndController() async {
     TemaServiceApi().refreshToken(context);
     String? storedToken = await storage.read(key: "token");
+    String? storedRefreshToken = await storage.read(key: "refresh_token");
     if (storedToken != null) {
       setState(() {
         token = storedToken;
+        refreshToken=storedRefreshToken!;
       });
     }
   }
+
+
+
 
   Timer scheduleTimeout([int milliseconds = 10000]) =>
       Timer(Duration(milliseconds: milliseconds), handleTimeout);
@@ -471,7 +479,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
         channelDescription:
-            'This notification appears when the aforeground service is running.',
+            'This notification appears when the a foreground service is running.',
         channelImportance: NotificationChannelImportance.HIGH,
         priority: NotificationPriority.HIGH,
         iconData: const NotificationIconData(

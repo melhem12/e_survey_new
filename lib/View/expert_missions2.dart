@@ -1,30 +1,25 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
 
+import 'package:android_intent/android_intent.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:e_survey/Models/MissionsModel.dart';
 import 'package:e_survey/View/accepted-mission.dart';
 import 'package:e_survey/View/new_mission.dart';
 import 'package:e_survey/View/tema_menu.dart';
 import 'package:e_survey/ViewModels/MissionsViewModel.dart';
 import 'package:e_survey/service/TemaServiceApi.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geolocator/geolocator.dart';
 
 // import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 // import 'package:flutter_background_service/flutter_background_service.dart';
 // import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:android_intent/android_intent.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../controllers/RefreshController.dart';
 import '../pages/signin.dart';
@@ -42,10 +37,12 @@ class ExpertMissions2 extends StatefulWidget {
   State<ExpertMissions2> createState() => _ExpertMissions2State();
 }
 
-class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingObserver {
+class _ExpertMissions2State extends State<ExpertMissions2>
+    with WidgetsBindingObserver {
   late Position _position;
   final box = GetStorage();
   late String token;
+  late String refreshToken;
 
   bool _isFetchingMoreData = false;
   final RefreshController refreshController = Get.find<RefreshController>();
@@ -55,8 +52,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
   final storage = FlutterSecureStorage();
 
   String? filter;
-   MissionsViewModel controller =
-  Get.put(MissionsViewModel());
+  MissionsViewModel controller = Get.put(MissionsViewModel());
 
 //  ExpertMissions({Key? key}) : super(key: key);
 
@@ -76,33 +72,24 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
 
     //initializeService() ;
 
-
     super.initState();
 
-
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {});
     print("///////////KKKKKKKKLLLLL");
     WidgetsBinding.instance.addObserver(this);
-
   }
+
   void refreshData() {
     TemaServiceApi().refreshToken(context);
     // Logic to refresh your data
     controller.refreshData();
-
   }
-
-
 
   // void _setupPeriodicUpdates() {
   //   Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
   //     controller.refreshData();
   //   });
   // }
-
 
   void _setupFirebaseMessaging() {
     String userId = box.read("userId").toString();
@@ -118,12 +105,15 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
       print('App resumed');
     }
   }
+
   void _initTokenAndController() async {
     TemaServiceApi().refreshToken(context);
     String? storedToken = await storage.read(key: "token");
+    String? storedRefreshToken = await storage.read(key: "refresh_token");
     if (storedToken != null) {
       setState(() {
         token = storedToken;
+        refreshToken=storedRefreshToken!;
       });
     }
   }
@@ -135,7 +125,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
     log("kkkkkkkkkkkkkkkkkkkkk");
   }
 
-
   Future<void> logout() async {
     await storage.delete(key: "token");
     await storage.delete(key: "refresh_token");
@@ -143,7 +132,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Signin()));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +146,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
           color: Colors.blue,
         ),
       ),
-
     );
     final drawerItems = ListView(
       children: <Widget>[
@@ -176,9 +163,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
                 Text('Logout'),
               ],
             ),
-            onTap: () async => {
-                  logout()
-                }),
+            onTap: () async => {logout()}),
       ],
     );
 
@@ -378,34 +363,31 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(mission.accidentCustomerName.toString(),
+                                      Text(
+                                          mission.accidentCustomerName
+                                              .toString(),
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
-                                              color:
-                                              mission.accidentStatus.toString() ==
-                                                  "new"
+                                              color: mission.accidentStatus
+                                                          .toString() ==
+                                                      "new"
                                                   ? Colors.green
                                                   : mission.accidentStatus
-                                                  .toString() ==
-                                                  "rejected"
-                                                  ? Colors.red
-                                                  : mission.accidentStatus
-                                                  .toString() ==
-                                                  "accepted"
-                                                  ? Colors.blue
-                                                  : Colors.grey)),
+                                                              .toString() ==
+                                                          "rejected"
+                                                      ? Colors.red
+                                                      : mission.accidentStatus
+                                                                  .toString() ==
+                                                              "accepted"
+                                                          ? Colors.blue
+                                                          : Colors.grey)),
                                       Text(mission.date.toString(),
                                           textAlign: TextAlign.right,
-                                          style: TextStyle()
-                                      ),
-
-                                    ]
-
-                                ),
-
+                                          style: TextStyle()),
+                                    ]),
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -445,7 +427,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
     );
   }
 
-
   T? _ambiguate<T>(T? value) => value;
 
   void _navigateAndRefresh(BuildContext context, Mission mission) async {
@@ -466,8 +447,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
       permission = await Geolocator.requestPermission();
     }
   }
-
-
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
@@ -501,7 +480,6 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
     }
     return true;
   }
-
 
   Future _checkGps() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
@@ -551,7 +529,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
                   //   service.invoke('stopService');
                   // }
 
-                  sendToNative(0,token);
+                  sendToNative(0, token,refreshToken);
 
                   setState(() {
                     GetStorage().write("status", "off");
@@ -560,8 +538,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
                   //_stopForegroundTask();
                   //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
 
-                  TemaServiceApi().updateGeoStatus(
-                      "notAvailable", token);
+                  TemaServiceApi().updateGeoStatus("notAvailable", token);
                 },
               ),
             ]));
@@ -586,7 +563,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
             onPressed: () async {
               GetStorage().write("status", "on");
 
-              sendToNative(2,token);
+              sendToNative(2, token,refreshToken);
 
               // final service = FlutterBackgroundService();
               // var isRunning = await service.isRunning();
@@ -596,8 +573,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
               // }
 
               setState(() {});
-              TemaServiceApi().updateGeoStatus(
-                  "available", token);
+              TemaServiceApi().updateGeoStatus("available", token);
               _position = await getLatAndLong();
               //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
 
@@ -609,7 +585,7 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
     );
   }
 
-  Future<void> sendToNative(int val,String token) async {
+  Future<void> sendToNative(int val, String token,String refreshToken) async {
     const MethodChannel _channel =
         const MethodChannel("FlutterFramework/swift_native");
 
@@ -617,13 +593,13 @@ class _ExpertMissions2State extends State<ExpertMissions2> with WidgetsBindingOb
       'value1': val,
       'value2': 3,
       'token': token,
+      'refreshToken': refreshToken,
     };
 
     final result = await _channel.invokeMethod('getSum', arguments);
     print("result from iOS native + Swift ${result}");
   }
 }
-
 
 Future<Position> getLatAndLong() async {
   // _position=await Geolocator.getCurrentPosition().then((value) => value);
