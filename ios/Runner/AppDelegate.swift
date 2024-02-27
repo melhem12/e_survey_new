@@ -38,7 +38,7 @@ didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: An
                                     let value2 = args["value2"] as? Int,
                                     let token = args["token"] as? String,
                                      let refreshToken = args["refreshToken"] as? String,
-                                     let time = args["time"] as? Int,
+                                     let time = args["time"] as? Int
                                  {
                                      // Store the bearer token
                                      self?.bearerToken = token
@@ -84,7 +84,7 @@ return super.application(application, didFinishLaunchingWithOptions: launchOptio
   }
 
  func startTimer() {
-        timer = Timer.scheduledTimer(timeInterval: self?.myTime, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+     timer = Timer.scheduledTimer(timeInterval: TimeInterval(myTime), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
         // Fire the timer immediately upon starting
         timer?.fire()
     }
