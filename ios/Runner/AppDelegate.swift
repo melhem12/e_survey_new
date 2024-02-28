@@ -48,6 +48,7 @@ print("time paramms:",t)
                                      // Use the arguments as needed in your Swift code
                                      let sum = self?.getSum(value1: value1, value2: value2) ?? 0
                                      result(sum)
+                       self?.startTimer()
                    } else {
                        result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid arguments from Flutter", details: nil))
                    }
@@ -79,7 +80,7 @@ print("time paramms:",t)
     application.registerUserNotificationSettings(settings)
 }
 application.registerForRemoteNotifications()
-    startTimer()
+
 return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
