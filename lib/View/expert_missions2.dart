@@ -61,6 +61,7 @@ class _ExpertMissions2State extends State<ExpertMissions2>
     getPosition();
     _setupFirebaseMessaging();
     _initTokenAndController();
+    refreshData();
     _scrollController.addListener(_onScroll);
     // _setupPeriodicUpdates();
     ever(refreshController.needRefresh, (_) {

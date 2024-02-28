@@ -67,6 +67,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
   void initState() {
     super.initState();
     _initTokenAndController();
+    refreshData();
 
     _scrollController.addListener(_onScroll);
     getPosition();
