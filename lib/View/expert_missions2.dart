@@ -108,23 +108,25 @@ class _ExpertMissions2State extends State<ExpertMissions2>
   }
 
   void _initTokenAndController() async {
-    TemaServiceApi().refreshToken(context);
     String? storedToken = await storage.read(key: "token");
     String? storedRefreshToken = await storage.read(key: "refresh_token");
+    TemaServiceApi().refreshToken(context);
+    storedToken = await storage.read(key: "token");
+    storedRefreshToken = await storage.read(key: "refresh_token");
     if (storedToken != null) {
       setState(() {
-        token = storedToken;
+        token = storedToken!;
         refreshToken=storedRefreshToken!;
       });
     }
   }
 
-  Timer scheduleTimeout([int milliseconds = 10000]) =>
-      Timer(Duration(milliseconds: milliseconds), handleTimeout);
+  // Timer scheduleTimeout([int milliseconds = 10000]) =>
+  //     Timer(Duration(milliseconds: milliseconds), handleTimeout);
 
-  void handleTimeout() {
-    log("kkkkkkkkkkkkkkkkkkkkk");
-  }
+  // void handleTimeout() {
+  //   log("kkkkkkkkkkkkkkkkkkkkk");
+  // }
 
   Future<void> logout() async {
     await storage.delete(key: "token");

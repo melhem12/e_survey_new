@@ -67,12 +67,14 @@ class _ExpertMissionsState extends State<ExpertMissions>
   void initState() {
     super.initState();
     _initTokenAndController();
+    _setupFirebaseMessaging();
+    getPosition();
+
+    _setupForegroundTask();
     refreshData();
 
     _scrollController.addListener(_onScroll);
-    getPosition();
-    _setupFirebaseMessaging();
-    _setupForegroundTask();
+
     // _setupPeriodicUpdates();
     ever(refreshController.needRefresh, (_) {
       if (refreshController.needRefresh.value) {
@@ -125,12 +127,14 @@ class _ExpertMissionsState extends State<ExpertMissions>
 
 
   void _initTokenAndController() async {
-    TemaServiceApi().refreshToken(context);
     String? storedToken = await storage.read(key: "token");
     String? storedRefreshToken = await storage.read(key: "refresh_token");
+    TemaServiceApi().refreshToken(context);
+    storedToken = await storage.read(key: "token");
+   storedRefreshToken = await storage.read(key: "refresh_token");
     if (storedToken != null) {
       setState(() {
-        token = storedToken;
+        token = storedToken!;
         refreshToken=storedRefreshToken!;
       });
     }
@@ -139,12 +143,12 @@ class _ExpertMissionsState extends State<ExpertMissions>
 
 
 
-  Timer scheduleTimeout([int milliseconds = 10000]) =>
-      Timer(Duration(milliseconds: milliseconds), handleTimeout);
-
-  void handleTimeout() {
-    log("kkkkkkkkkkkkkkkkkkkkk");
-  }
+  // Timer scheduleTimeout([int milliseconds = 10000]) =>
+  //     Timer(Duration(milliseconds: milliseconds), handleTimeout);
+  //
+  // void handleTimeout() {
+  //   log("kkkkkkkkkkkkkkkkkkkkk");
+  // }
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
