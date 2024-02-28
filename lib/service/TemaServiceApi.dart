@@ -530,10 +530,10 @@ class TemaServiceApi {
 
   Future<void> refreshToken(BuildContext context) async {
     final url = Uri.parse(AppUrl.refresh_token_app);
-    final box = FlutterSecureStorage();
+    final storage = FlutterSecureStorage();
 
     try {
-      final refreshTokenOld = await box.read(key: "refresh_token");
+      final refreshTokenOld = await storage.read(key: "refresh_token");
       log("Old Refresh Token: $refreshTokenOld");
 
       final response = await http.post(
@@ -547,11 +547,11 @@ class TemaServiceApi {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         String token = responseData['token'];
-        await box.write(key: 'token', value: token);
+        await storage.write(key: 'token', value: token);
         print('New Token: $token');
 
         String refreshToken = responseData['refreshToken'];
-        await box.write(
+        await storage.write(
             key: 'refresh_token',
             value: refreshToken); // Use consistent key name
       } else {
@@ -570,6 +570,7 @@ class TemaServiceApi {
 
     await storage.delete(key: "token");
     await storage.delete(key: "refresh_token");
+    await storage.delete(key: "userId");
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Signin()));
   }

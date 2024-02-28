@@ -39,8 +39,9 @@ class _ExpertMissionsState extends State<ExpertMissions>
   bool _isFetchingMoreData = false;
   final RefreshController refreshController = Get.find<RefreshController>();
 
-  final box = GetStorage();
+  // final box = GetStorage();
   String token = "";
+  String userId = "";
   String? filter;
   final s=2000;
   late String refreshToken;
@@ -95,9 +96,10 @@ class _ExpertMissionsState extends State<ExpertMissions>
     controller.refreshData();
   }
 
-  void _setupFirebaseMessaging() {
-    String userId = box.read("userId").toString();
-    FirebaseMessaging.instance.subscribeToTopic(userId);
+  void _setupFirebaseMessaging() async {
+    String? userId = await storage.read(key: "userId");
+
+    FirebaseMessaging.instance.subscribeToTopic(userId.toString());
   }
 
   void _setupForegroundTask() {
@@ -129,6 +131,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
   void _initTokenAndController() async {
     String? storedToken = await storage.read(key: "token");
     String? storedRefreshToken = await storage.read(key: "refresh_token");
+    String? storedUser = await storage.read(key: "userId");
     TemaServiceApi().refreshToken(context);
     storedToken = await storage.read(key: "token");
    storedRefreshToken = await storage.read(key: "refresh_token");
@@ -136,6 +139,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
       setState(() {
         token = storedToken!;
         refreshToken=storedRefreshToken!;
+        userId=storedUser!;
       });
     }
   }
@@ -170,8 +174,8 @@ class _ExpertMissionsState extends State<ExpertMissions>
   Future<void> logout() async {
     await storage.delete(key: "token");
     await storage.delete(key: "refresh_token");
-
-    box.remove("userId");
+    await storage.delete(key: "userId");
+    // box.remove("userId");
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Signin()));
   }
@@ -179,8 +183,8 @@ class _ExpertMissionsState extends State<ExpertMissions>
   @override
   Widget build(BuildContext context) {
     var drawerHeader = UserAccountsDrawerHeader(
-      accountName: Text(box.read("userId").toString()),
-      accountEmail: Text(box.read("userId").toString()),
+      accountName: Text(userId),
+      accountEmail: Text(userId),
       currentAccountPicture: CircleAvatar(
         backgroundColor: Colors.white,
         child: Icon(

@@ -40,10 +40,10 @@ class ExpertMissions2 extends StatefulWidget {
 class _ExpertMissions2State extends State<ExpertMissions2>
     with WidgetsBindingObserver {
   late Position _position;
-  final box = GetStorage();
+  // final box = GetStorage();
   late String token;
   late String refreshToken;
-
+  String userId = "";
   bool _isFetchingMoreData = false;
   final RefreshController refreshController = Get.find<RefreshController>();
 
@@ -92,9 +92,9 @@ class _ExpertMissions2State extends State<ExpertMissions2>
   //   });
   // }
 
-  void _setupFirebaseMessaging() {
-    String userId = box.read("userId").toString();
-    FirebaseMessaging.instance.subscribeToTopic(userId);
+  void _setupFirebaseMessaging() async{
+    String? userId = await storage.read(key: "userId");
+    FirebaseMessaging.instance.subscribeToTopic(userId!);
   }
 
   @override
@@ -110,6 +110,7 @@ class _ExpertMissions2State extends State<ExpertMissions2>
   void _initTokenAndController() async {
     String? storedToken = await storage.read(key: "token");
     String? storedRefreshToken = await storage.read(key: "refresh_token");
+    String? storedUser = await storage.read(key: "userId");
     TemaServiceApi().refreshToken(context);
     storedToken = await storage.read(key: "token");
     storedRefreshToken = await storage.read(key: "refresh_token");
@@ -117,6 +118,7 @@ class _ExpertMissions2State extends State<ExpertMissions2>
       setState(() {
         token = storedToken!;
         refreshToken=storedRefreshToken!;
+        userId=storedUser!;
       });
     }
   }
@@ -131,7 +133,8 @@ class _ExpertMissions2State extends State<ExpertMissions2>
   Future<void> logout() async {
     await storage.delete(key: "token");
     await storage.delete(key: "refresh_token");
-    box.remove("userId");
+    await storage.delete(key: "userId");
+
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Signin()));
   }
@@ -139,8 +142,8 @@ class _ExpertMissions2State extends State<ExpertMissions2>
   @override
   Widget build(BuildContext context) {
     var drawerHeader = UserAccountsDrawerHeader(
-      accountName: Text(box.read("userId").toString()),
-      accountEmail: Text(box.read("userId").toString()),
+      accountName: Text(userId),
+      accountEmail: Text(userId),
       currentAccountPicture: CircleAvatar(
         backgroundColor: Colors.white,
         child: Icon(

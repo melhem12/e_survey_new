@@ -81,6 +81,7 @@ String savedUid ="";
         _setStringPref("userId", response.token);
         // box.write("token",response.token );
         box.write("userId",user.userId );
+        await storage.write(key: "userId", value:user.userId);
         await storage.write(key: "token", value: response.token);
         await storage.write(key: "refresh_token", value: response.refreshToken);
         if(Platform.isIOS){
