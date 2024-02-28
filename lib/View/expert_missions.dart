@@ -42,6 +42,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
   final box = GetStorage();
   String token = "";
   String? filter;
+  final s=2000;
   late String refreshToken;
   ReceivePort? _receivePort;
   RxBool _isRefreshing = false.obs;
@@ -99,7 +100,9 @@ class _ExpertMissionsState extends State<ExpertMissions>
   void _setupForegroundTask() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _requestPermissionForAndroid();
-      _initForegroundTask();
+      int time=  await  TemaServiceApi().getWorkingTime(token );
+
+      _initForegroundTask(time);
       if (await FlutterForegroundTask.isRunningService) {
         final newReceivePort = FlutterForegroundTask.receivePort;
         _registerReceivePort(newReceivePort);
@@ -472,7 +475,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
     }
   }
 
-  void _initForegroundTask() {
+  void _initForegroundTask(int time) {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         id: 500,
@@ -505,8 +508,8 @@ class _ExpertMissionsState extends State<ExpertMissions>
         showNotification: true,
         playSound: false,
       ),
-      foregroundTaskOptions: const ForegroundTaskOptions(
-        interval: 5000,
+      foregroundTaskOptions:  ForegroundTaskOptions(
+        interval: time*1000,
         isOnceEvent: false,
         autoRunOnBoot: true,
         allowWakeLock: true,
@@ -669,12 +672,13 @@ class _ExpertMissionsState extends State<ExpertMissions>
                     GetStorage().write("status", "off");
                   });
                   _stopForegroundTask();
+                  TemaServiceApi().updateGeoStatus("notAvailable", token);
+
                   await TemaServiceApi().updateGeoLocation(
                       _position.latitude.toString(),
                       _position.longitude.toString(),
                       token);
 
-                  TemaServiceApi().updateGeoStatus("notAvailable", token);
                 },
               ),
             ]));
@@ -760,14 +764,15 @@ class MyTaskHandler extends TaskHandler {
     getLatAndLong();
 
     final token = await _storage.read(key: "token");
-    print("My token: ${token ?? 'Token not available'}");
-
+if(_position!=null){
     await TemaServiceApi().updateGeoLocation(
         _position.latitude.toString(), _position.longitude.toString(), token!);
     log(_position.latitude.toString());
 
     print("My lattitude " + _position.latitude.toString());
     print("My longitude " + _position.longitude.toString());
+}
+
   }
 
   @override

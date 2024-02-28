@@ -42,6 +42,7 @@ class AppUrl {
   static const String missions = baseUrl + '/missions';
   static const String updateAccidentStatus = baseUrl + '/updateAccidentStatus';
   static const String updateArrivedStatus = baseUrl + '/updateArrivedStatus';
+  static const String getWorkingTime = baseUrl + '/getWorkingTime';
   static const String accidentConditions = baseUrl + '/accidentConditions';
   static const String damageCap = baseUrl + '/damageCap';
   static const String responsabilities = baseUrl + '/responsabilities';

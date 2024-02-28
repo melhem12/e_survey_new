@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
@@ -11,14 +12,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'dart:convert';
+
 import '../Models/AccidentConditionModel.dart';
 import '../Models/AppDamage.dart';
 import '../Models/AppNotes.dart';
 import '../Models/LoginResponse.dart';
 import '../Models/Responsability.dart';
-import '../View/expert_missions.dart';
-import '../View/expert_missions2.dart';
 import '../pages/signin.dart';
 
 class TemaServiceApi {
@@ -131,6 +130,30 @@ class TemaServiceApi {
       success = data["verficationSuccess"];
 
       return success;
+    } else {
+      throw Exception('Failed to  get insert updateArrivedStatus ');
+    }
+  }
+
+  Future<int> getWorkingTime(String token) async {
+    log(token);
+
+    int time = 0;
+
+    var response = await http.get(
+      Uri.parse(AppUrl.getWorkingTime),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      log(response.body);
+      final data = json.decode(response.body)["data"];
+      time = data;
+
+      return time;
     } else {
       throw Exception('Failed to  get insert updateArrivedStatus ');
     }
@@ -341,8 +364,8 @@ class TemaServiceApi {
     return response;
   }
 
-  Future uploadImage(
-      String filename, String name, String token, String accidentId,BuildContext context) async {
+  Future uploadImage(String filename, String name, String token,
+      String accidentId, BuildContext context) async {
     refreshToken(context);
 
     var request = http.MultipartRequest(
@@ -365,7 +388,8 @@ class TemaServiceApi {
     var res = await request.send();
   }
 
-  Future<AppBodly> getCarsAppBodly(String token, String accidentId,BuildContext context) async {
+  Future<AppBodly> getCarsAppBodly(
+      String token, String accidentId, BuildContext context) async {
     refreshToken(context);
     final url = Uri.parse(AppUrl.getCarsAppBodly + "?accidentId=" + accidentId);
     http.Response response = await http.get(url, headers: <String, String>{
@@ -385,7 +409,7 @@ class TemaServiceApi {
   }
 
   Future<List<AppDamagePartResponse>> getCarsAppDamageParts(
-      String token, String accidentId,BuildContext context) async {
+      String token, String accidentId, BuildContext context) async {
     refreshToken(context);
 
     final url =
@@ -407,8 +431,8 @@ class TemaServiceApi {
     return damageList;
   }
 
-  Future<void> updateCarsAppBodly(
-      String accidentId, String token, AppBodly myAppBodly,BuildContext context) async {
+  Future<void> updateCarsAppBodly(String accidentId, String token,
+      AppBodly myAppBodly, BuildContext context) async {
     refreshToken(context);
 
     var response = await http.post(
@@ -435,7 +459,7 @@ class TemaServiceApi {
   }
 
   Future uploadNotes(String? filename, String notesRemark, String token,
-      String carsAppAccidentId,BuildContext context) async {
+      String carsAppAccidentId, BuildContext context) async {
     refreshToken(context);
 
     var request = http.MultipartRequest(
@@ -531,19 +555,15 @@ class TemaServiceApi {
             key: 'refresh_token',
             value: refreshToken); // Use consistent key name
       } else {
-
-
-
         // Handle different status codes or add a general error log
         log('Request failed with status: ${response.statusCode}.');
-        logout( context);
+        logout(context);
       }
     } catch (error) {
       log('An error occurred: $error');
-      logout( context);
+      logout(context);
     }
   }
-
 
   Future<void> logout(BuildContext context) async {
     final storage = FlutterSecureStorage();
@@ -553,7 +573,6 @@ class TemaServiceApi {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Signin()));
   }
-
 
   Future<LoginResponse> login(
       String username, String password, BuildContext context) async {
@@ -589,7 +608,8 @@ class TemaServiceApi {
   Future<bool> updateCarsAppDamageParts(
       List<AppDamagePartResponse> damagedParts,
       String token,
-      String accidentId,BuildContext context) async {
+      String accidentId,
+      BuildContext context) async {
     refreshToken(context);
 
     // log(damagedParts[0].surveyDamagedSeverity.toString());
@@ -614,8 +634,8 @@ class TemaServiceApi {
     }
   }
 
-  Future<bool> updateCarsAppDamagePartsPic(
-      String token, String accidentId, Uint8List capturedImage,BuildContext context) async {
+  Future<bool> updateCarsAppDamagePartsPic(String token, String accidentId,
+      Uint8List capturedImage, BuildContext context) async {
     refreshToken(context);
     try {
       // Add the image as a MultipartFile

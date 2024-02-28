@@ -523,13 +523,18 @@ class _ExpertMissions2State extends State<ExpertMissions2>
                   color: Colors.white,
                 ),
                 onPressed: () async {
+
                   // final service = FlutterBackgroundService();
                   // var isRunning = await service.isRunning();
                   // if (isRunning) {
                   //   service.invoke('stopService');
                   // }
+                  TemaServiceApi().refreshToken(context);
+                  TemaServiceApi().updateGeoStatus("notAvailable", token);
 
-                  sendToNative(0, token,refreshToken,30);
+                  int time=  await  TemaServiceApi().getWorkingTime(token );
+
+                  sendToNative(0, token,refreshToken,time);
 
                   setState(() {
                     GetStorage().write("status", "off");
@@ -538,7 +543,6 @@ class _ExpertMissions2State extends State<ExpertMissions2>
                   //_stopForegroundTask();
                   //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
 
-                  TemaServiceApi().updateGeoStatus("notAvailable", token);
                 },
               ),
             ]));
@@ -562,8 +566,10 @@ class _ExpertMissions2State extends State<ExpertMissions2>
             ),
             onPressed: () async {
               GetStorage().write("status", "on");
-
-              sendToNative(2, token,refreshToken,30);
+              TemaServiceApi().refreshToken(context);
+              int time=  await  TemaServiceApi().getWorkingTime(token );
+              TemaServiceApi().updateGeoStatus("available", token);
+              sendToNative(2, token,refreshToken,time);
 
               // final service = FlutterBackgroundService();
               // var isRunning = await service.isRunning();
@@ -573,7 +579,6 @@ class _ExpertMissions2State extends State<ExpertMissions2>
               // }
 
               setState(() {});
-              TemaServiceApi().updateGeoStatus("available", token);
               _position = await getLatAndLong();
               //    await TemaServiceApi().updateGeoLocation(_position.latitude.toString(), _position.longitude.toString(), token);
 
