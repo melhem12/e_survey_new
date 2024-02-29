@@ -719,10 +719,15 @@ class _ExpertMissionsState extends State<ExpertMissions>
               setState(() {});
               TemaServiceApi().updateGeoStatus("available", token);
               _position = (await getLatAndLong())!;
+              try{
               await TemaServiceApi().updateGeoLocation(
                   _position.latitude.toString(),
                   _position.longitude.toString(),
                   token);
+              }
+              catch(e){
+
+              }
               _setupForegroundTask();
               //  refreshData();
               _startForegroundTask();

@@ -560,8 +560,47 @@ class TemaServiceApi {
         logout(context);
       }
     } catch (error) {
+      _showDialog(context, 'CHECK INTERNET CONNECTION');
+
       log('An error occurred: $error');
-      logout(context);
+    }
+  }
+
+  Future<void> refreshToken2() async {
+    final url = Uri.parse(AppUrl.refresh_token_app);
+    final storage = FlutterSecureStorage();
+
+    try {
+      final refreshTokenOld = await storage.read(key: "refresh_token");
+      log("Old Refresh Token: $refreshTokenOld");
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'refreshToken': refreshTokenOld,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        String token = responseData['token'];
+        await storage.write(key: 'token', value: token);
+        print('New Token: $token');
+
+        String refreshToken = responseData['refreshToken'];
+        await storage.write(
+            key: 'refresh_token',
+            value: refreshToken); // Use consistent key name
+      } else {
+        // Handle different status codes or add a general error log
+        log('Request failed with status: ${response.statusCode}.');
+        // logout(context);
+      }
+    } catch (error) {
+      // _showDialog(context,'An error occurred: $error');
+
+      log('An error occurred: $error');
     }
   }
 

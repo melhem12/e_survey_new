@@ -14,6 +14,7 @@ class MissionsViewModel extends GetxController {
   final int pageSize = 15;
   bool isLoading = false;
   bool hasMoreData = true;
+
   // BuildContext context;
 
   MissionsViewModel();
@@ -29,7 +30,7 @@ class MissionsViewModel extends GetxController {
   }
 
   Future<void> getData({int page = 0}) async {
-
+    await TemaServiceApi().refreshToken2();
     final token1 = await FlutterSecureStorage().read(key: "token");
     if (isLoading || !hasMoreData) return;
 
@@ -67,7 +68,7 @@ class MissionsViewModel extends GetxController {
 
     currentPage = 0; // Reset to the first page
     hasMoreData = true; // Reset hasMoreData flag
-    await getData( page: currentPage);
+    await getData(page: currentPage);
   }
 
   void searchMission(String query) {
@@ -80,8 +81,9 @@ class MissionsViewModel extends GetxController {
     }
 
     final List<Mission> suggestions = missions
-        .where((mission) =>
-        mission.accidentCustomerName.toLowerCase().contains(query.toLowerCase()))
+        .where((mission) => mission.accidentCustomerName
+            .toLowerCase()
+            .contains(query.toLowerCase()))
         .toList();
 
     if (suggestions.isNotEmpty) {
@@ -93,5 +95,4 @@ class MissionsViewModel extends GetxController {
       missions.clear();
     }
   }
-
 }
