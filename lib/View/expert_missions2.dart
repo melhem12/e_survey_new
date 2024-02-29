@@ -224,7 +224,7 @@ class _ExpertMissions2State extends State<ExpertMissions2>
                   if (value.trim().isNotEmpty) {
                     controller.searchMission(value);
                   } else {
-                    controller.getData();
+                    controller.refreshData();
                   }
                 },
                 style: const TextStyle(

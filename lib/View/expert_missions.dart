@@ -37,6 +37,9 @@ class _ExpertMissionsState extends State<ExpertMissions>
     with WidgetsBindingObserver {
   late Position _position;
   bool _isFetchingMoreData = false;
+   MissionsViewModel controller = Get.put(MissionsViewModel());
+
+  // late MissionsViewModel controller ;
   final RefreshController refreshController = Get.find<RefreshController>();
 
   // final box = GetStorage();
@@ -46,13 +49,12 @@ class _ExpertMissionsState extends State<ExpertMissions>
   final s=2000;
   late String refreshToken;
   ReceivePort? _receivePort;
-  RxBool _isRefreshing = false.obs;
   final storage = FlutterSecureStorage();
   ScrollController _scrollController = ScrollController();
 
   // MissionsViewModel? controller; // Already nullable
 
-  MissionsViewModel controller = Get.put(MissionsViewModel());
+
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -69,9 +71,10 @@ class _ExpertMissionsState extends State<ExpertMissions>
     super.initState();
     _initTokenAndController();
     _setupFirebaseMessaging();
+    _setupForegroundTask();
+
     getPosition();
 
-    _setupForegroundTask();
     refreshData();
 
     _scrollController.addListener(_onScroll);
@@ -102,7 +105,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
     FirebaseMessaging.instance.subscribeToTopic(userId.toString());
   }
 
-  void _setupForegroundTask() {
+  void _setupForegroundTask() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _requestPermissionForAndroid();
       int time=  await  TemaServiceApi().getWorkingTime(token );
@@ -132,6 +135,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
     String? storedToken = await storage.read(key: "token");
     String? storedRefreshToken = await storage.read(key: "refresh_token");
     String? storedUser = await storage.read(key: "userId");
+    // controller = MissionsViewModel(context);
     TemaServiceApi().refreshToken(context);
     storedToken = await storage.read(key: "token");
    storedRefreshToken = await storage.read(key: "refresh_token");
@@ -147,12 +151,12 @@ class _ExpertMissionsState extends State<ExpertMissions>
 
 
 
-  // Timer scheduleTimeout([int milliseconds = 10000]) =>
-  //     Timer(Duration(milliseconds: milliseconds), handleTimeout);
-  //
-  // void handleTimeout() {
-  //   log("kkkkkkkkkkkkkkkkkkkkk");
-  // }
+  Timer scheduleTimeout([int milliseconds = 10000]) =>
+      Timer(Duration(milliseconds: milliseconds), handleTimeout);
+
+  void handleTimeout() {
+    log("kkkkkkkkkkkkkkkkkkkkk");
+  }
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
@@ -254,9 +258,9 @@ class _ExpertMissionsState extends State<ExpertMissions>
                 onChanged: (String value) {
                   filter = value;
                   if (value.trim().isNotEmpty) {
-                    controller!.searchMission(value);
+                    controller.searchMission(value);
                   } else {
-                    controller!.getData();
+                    controller.refreshData();
                   }
                 },
                 style: const TextStyle(
@@ -528,6 +532,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
   }
 
   Future<bool> _startForegroundTask() async {
+
     print("start fg service");
 
     // You can save data using the saveData function.
@@ -718,7 +723,8 @@ class _ExpertMissionsState extends State<ExpertMissions>
                   _position.latitude.toString(),
                   _position.longitude.toString(),
                   token);
-
+              _setupForegroundTask();
+              //  refreshData();
               _startForegroundTask();
             },
           ),
@@ -773,6 +779,7 @@ class MyTaskHandler extends TaskHandler {
     getLatAndLong();
 
     final token = await _storage.read(key: "token");
+    try{
 if(_position!=null){
     await TemaServiceApi().updateGeoLocation(
         _position.latitude.toString(), _position.longitude.toString(), token!);
@@ -780,7 +787,10 @@ if(_position!=null){
 
     print("My lattitude " + _position.latitude.toString());
     print("My longitude " + _position.longitude.toString());
-}
+}}catch(e){
+      print('Error occurred: $e'); // Print the error message
+
+    }
 
   }
 
