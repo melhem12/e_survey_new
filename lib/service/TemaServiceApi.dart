@@ -155,7 +155,7 @@ class TemaServiceApi {
 
       return time;
     } else {
-      throw Exception('Failed to  get insert updateArrivedStatus ');
+      return 15;
     }
   }
 
@@ -511,6 +511,7 @@ class TemaServiceApi {
   }
 
   void updateGeoStatus(String status, String token) async {
+    refreshToken2();
     var response = await http.post(
       Uri.parse(AppUrl.updateGeoStatus),
       headers: <String, String>{
