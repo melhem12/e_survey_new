@@ -95,7 +95,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
   // }
 
   void refreshData() async {
-    TemaServiceApi().refreshToken(context);
+    // TemaServiceApi().refreshToken(context);
     controller.refreshData();
   }
 

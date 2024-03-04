@@ -39,7 +39,7 @@ class _AccidentImagesState extends State<AccidentImages> {
   @override
   void initState() {
     m=Get.arguments as Mission ;
-    // TODO: implement initState
+
     super.initState();
     getAccPictures();
   }

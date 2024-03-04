@@ -118,7 +118,7 @@ Card makeDashboardItem2(String title, IconData icon, String path,BuildContext co
           if(
           path=='/damagePictures'
           ){
-            Navigator.push(context,MaterialPageRoute(builder: (context)=>DamagedPictures()));
+            // Navigator.push(context,MaterialPageRoute(builder: (context)=>DamagedPictures()));
           }
           if(
           path=='/parts'
