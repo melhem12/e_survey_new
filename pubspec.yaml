@@ -74,7 +74,7 @@ dev_dependencies:
   audioplayers: ^5.1.0
   custom_check_box: ^0.0.4
   flutter_foreground_task: ^6.0.0+1
-  advance_image_picker: ^0.1.7+1
+#  advance_image_picker: ^0.1.7+1
   flutter_background_service: ^5.0.1
   device_info_plus: ^9.0.3
     #flutter_ffmpeg: ^0.3.1
