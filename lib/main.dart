@@ -69,6 +69,7 @@ void main() async => {
       }),
 
       runApp(GetMaterialApp(
+        debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
           '/home': (context) => Home(),

@@ -41,7 +41,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Example usage description</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>This app needs access to your location to provide enhanced features and services. Your location will be used both when the app is in use and in the background.</string>
+    <string>This app needs access to your location to send for you new nearby accidents missions. Your location will be used both when the app is in use and in the background .</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background.</string>
 	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
@@ -50,7 +50,7 @@
 		<string>The example App requires temporary access to the device's precise location.</string>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open.</string>
+	<string>This app needs access  to your location to send for you new nearby accidents missions</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This example wants to access your microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
