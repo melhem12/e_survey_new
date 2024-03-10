@@ -540,11 +540,11 @@ late PolicyType _policyType =PolicyType(code: '', description: '');
 
 
                                 return  DropdownSearch<Brands>(
-                                    mode: Mode.MENU,
+                                    // mode: Mode.MENU,
                                     // showSelectedItems: true,
                                     items:  snapshot.data!,
                                   itemAsString: ( var u) => u!.carBrandDescription,
-                                    showSearchBox: true,
+                                    // showSearchBox: true,
                                   onChanged: (Brands? value) {
                                     log(value!.carBrandDescription);
                                     this.setState(() {
@@ -572,8 +572,8 @@ late PolicyType _policyType =PolicyType(code: '', description: '');
                                     }
                                     return null;
                                   },
-                                  label: "Make Name",
-                                  hint: hintBrand,
+                                  // label: "Make Name",
+                                  // hint: hintBrand,
                                   selectedItem: _brands,
                                   );
 
@@ -657,11 +657,11 @@ late PolicyType _policyType =PolicyType(code: '', description: '');
 
 
                             return  DropdownSearch<CarTradeMark>(
-                              mode: Mode.MENU,
+                              // mode: Mode.MENU,
                               // showSelectedItems: true,
                               items:  snapshot.data!,
                               itemAsString: ( var u) => u!.carTrademarkDescription,
-                              showSearchBox: true,
+                              // showSearchBox: true,
                               onChanged: (CarTradeMark? value) {
                                                 setState(() => _carTradeMark = value!);
 
@@ -675,7 +675,7 @@ late PolicyType _policyType =PolicyType(code: '', description: '');
                                 else
                                   return null;
                               },
-                              label: "Model Name",
+                              // label: "Model Name",
                               selectedItem: _carTradeMark,
                             );
 
@@ -983,18 +983,18 @@ late PolicyType _policyType =PolicyType(code: '', description: '');
 
 
                                 return  DropdownSearch<InsuranceCompany>(
-                                  mode: Mode.BOTTOM_SHEET,
+                                  // mode: Mode.BOTTOM_SHEET,
                                   // showSelectedItems: true,
                                   items:  snapshot.data!,
                                   itemAsString: ( var u) => u!.supplierName,
-                                  showSearchBox: true,
+                                  // showSearchBox: true,
                                   onChanged: (InsuranceCompany? value) {
                                     setState(() => _insuranceCompany = value!);
 
                                   },
 
 
-                                  label: "Insurance company",
+                                  // label: "Insurance company",
                                   selectedItem: _insuranceCompany,
                                 );
 

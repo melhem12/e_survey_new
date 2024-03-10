@@ -1,25 +1,16 @@
-import 'dart:developer';
+import 'dart:io' as io;
 import 'dart:io';
 
+import 'package:e_survey/Models//user.dart';
 import 'package:e_survey/View/expert_missions.dart';
 import 'package:e_survey/View/expert_missions2.dart';
-import 'package:e_survey/utility/app_url.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_svg/svg.dart';
-import 'package:e_survey/pages/dashboard.dart';
-import 'package:e_survey/Models//user.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 import '../Models/LoginResponse.dart';
 import '../service/TemaServiceApi.dart';
-import 'bridge_page.dart';
-import 'home.dart';
-import 'dart:io' as io;
 class Signin extends StatefulWidget {
 
   @override
@@ -48,7 +39,7 @@ String savedUid ="";
     );
 
 
-    _checkLoginStatus();
+    //_checkLoginStatus();
 
     super.initState();
 

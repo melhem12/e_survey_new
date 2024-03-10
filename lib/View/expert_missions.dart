@@ -21,8 +21,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../controllers/RefreshController.dart';
 import '../pages/signin.dart';
-
+@pragma('vm:entry-point')
 void startCallback() {
+  FlutterForegroundTask.setTaskHandler(MyTaskHandler());
+}
+@pragma('vm:entry-point')
+void updateCallback() {
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
 
@@ -66,6 +70,7 @@ class _ExpertMissionsState extends State<ExpertMissions>
     }
   }
 
+
   @override
   void initState() {
     super.initState();
@@ -98,6 +103,8 @@ class _ExpertMissionsState extends State<ExpertMissions>
     // TemaServiceApi().refreshToken(context);
     controller.refreshData();
   }
+
+
 
   void _setupFirebaseMessaging() async {
     String? userId = await storage.read(key: "userId");
@@ -781,6 +788,7 @@ class MyTaskHandler extends TaskHandler {
         notificationText: 'Enter ......');
 
     print('before getLong ');
+    log('before getLong ');
     getLatAndLong();
 
     final token = await _storage.read(key: "token");

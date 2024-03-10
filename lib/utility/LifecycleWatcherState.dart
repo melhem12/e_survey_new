@@ -31,6 +31,8 @@ abstract class LifecycleWatcherState<T extends StatefulWidget> extends State<T>
       case AppLifecycleState.detached:
         onDetached();
         break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
     }
   }
 
