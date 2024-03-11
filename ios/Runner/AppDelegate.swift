@@ -168,17 +168,17 @@ return super.application(application, didFinishLaunchingWithOptions: launchOptio
 
 
        func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-             if let location = locations.last {
-                    print("Lat : \(location.coordinate.latitude) \nLng : \(location.coordinate.longitude)")
-
-
-
-                 // Send location data to API with bearer token
-
-             //    sendLocationToAPIWithToken(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-
-
-             }
+//              if let location = locations.last {
+//                     print("Lat : \(location.coordinate.latitude) \nLng : \(location.coordinate.longitude)")
+//
+//
+//
+//                  // Send location data to API with bearer token
+//
+//              //    sendLocationToAPIWithToken(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+//
+//
+//              }
          }
 
 
